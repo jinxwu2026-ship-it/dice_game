@@ -24,9 +24,9 @@ resolved for Version 1 of *The King's Gambit*.
 ## Project guidance
 
 - [x] Add project-specific instructions to `AGENTS.md`.
-- [ ] Add exact commands for running the game and automated tests once the
-  initial project structure exists.
+- [x] Add the exact command for running the automated tests. Add the final game
+  command after the playable entry point exists.
 - [ ] Keep the ASCII UI, input handling, scoring rules, battle flow, and run
   progression in separate modules as described in `docs/game_design.md`.
-- [ ] Add tests for scoring, selection validation, banking, busts, invalid
-  input, and important state transitions.
+- [x] Add tests for the current dice-rule core: scoring, selection validation,
+  banking, busts, malformed values, and hot-dice state transitions.

@@ -10,9 +10,10 @@ gamebar. Version 1 is designed to use only the Python standard library.
 
 ## Project status
 
-The project is currently in the design and initial-development stage. The game
-rules and Version 1 scope are documented, but the playable implementation is
-not complete yet.
+The dice-rule core and a single-player CLI practice mode are implemented and
+tested. Practice mode includes dice rolling, scoring, selection validation,
+busts, banking, and hot dice. AI, rewards, the shop, encounters, and the
+complete playable flow are not implemented yet.
 
 ## Basic game rules
 
@@ -98,11 +99,12 @@ implemented, run it from the project directory with:
 python main.py
 ```
 
-At the current project stage, this command does not yet start a complete game.
+At the current project stage, this command starts a single-player dice practice
+mode rather than the complete five-encounter game.
 
 ## Running tests
 
-Once the test suite has been added, run:
+Run the automated tests with:
 
 ```powershell
 python -m unittest discover -s tests
@@ -133,4 +135,5 @@ tests/
 `-- test_scoring.py
 ```
 
-The structure will be created incrementally as Version 1 is implemented.
+The remaining modules will be created incrementally as Version 1 is
+implemented.
