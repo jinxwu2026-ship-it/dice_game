@@ -1,9 +1,9 @@
 """Command-line display and input for the dice practice mode."""
 
-from the_kings_gambit.battle import resolve_roll
+from the_kings_gambit.battle import begin_roll, resolve_roll
 from the_kings_gambit.dice import roll_dice
 from the_kings_gambit.models import TurnState
-from the_kings_gambit.scoring import is_bust
+from the_kings_gambit.scoring import enumerate_legal_selections
 
 
 def parse_positions(text):
@@ -25,7 +25,7 @@ def parse_positions(text):
 
 def _show_roll(roll, output_func):
     """Display every die with its one-based selection position."""
-    positions = "  ".join(str(position) for position in range(1, len(roll) + 1))
+    positions = "  ".join(f" {position} " for position in range(1, len(roll) + 1))
     dice = "  ".join(f"[{die}]" for die in roll)
     output_func(f"Positions: {positions}")
     output_func(f"Dice:      {dice}")
@@ -35,8 +35,8 @@ def _ask_for_selection(state, roll, input_func, output_func):
     """Keep asking until the player enters a valid scoring selection."""
     while True:
         text = input_func("Select scoring dice by position (or Q to quit): ").strip()
-        if text.lower() == "q":
-            return False
+        if text.lower() in ("q", "quit"):
+            return "quit"
 
         try:
             positions = parse_positions(text)
@@ -53,7 +53,10 @@ def _ask_for_selection(state, roll, input_func, output_func):
         output_func(f"Unbanked score: {state.unbanked_score}")
         if result == "hot_dice":
             output_func("HOT DICE! All six dice are available again.")
-        return True
+        if result == "ordinary_pairs":
+            output_func("THREE PAIRS: +0, earlier turn points kept. Rerolling six dice now.")
+        output_func(f"Dice available next: {state.dice_available}")
+        return result
 
 
 def _ask_to_roll_or_bank(state, input_func, output_func):
@@ -76,6 +79,21 @@ def run_practice(input_func=input, output_func=print, random_source=None):
     output_func("THE KING'S GAMBIT - DICE PRACTICE")
     output_func("Select dice using positions such as: 1 3 5")
     output_func("Only banked points are safe. Q exits practice mode.")
+    output_func("Target: 2000 banked points. No AI or opponents in this version.")
+    output_func("Singles: 1=100, 5=50. Triples: 111=500; others=face x 100.")
+    output_func("Each matching die beyond three adds 200. Straights: 500 / 600 / 1200.")
+    output_func("Consecutive pairs: 112233=1200, 223344=1000, 334455=1100, 445566=1200.")
+    output_func("Ordinary three pairs: select all six positions for +0 and an immediate reroll.")
+
+    original_input = input_func
+
+    def safe_input(prompt):
+        try:
+            return original_input(prompt)
+        except (EOFError, KeyboardInterrupt):
+            return "q"
+
+    input_func = safe_input
 
     match_score = 0
     while True:
@@ -88,15 +106,21 @@ def run_practice(input_func=input, output_func=print, random_source=None):
             _show_roll(roll, output_func)
 
             # Bust rolls do not ask the player to choose dice.
-            if is_bust(roll):
-                resolve_roll(state, roll)
+            if begin_roll(state, roll) == "bust":
                 output_func("BUST! All unbanked points were lost.")
                 output_func(f"Match score remains: {state.match_score}")
                 break
 
-            if not _ask_for_selection(state, roll, input_func, output_func):
+            actions = enumerate_legal_selections(roll)
+            if any(action["action_type"] == "ordinary_pairs" for action in actions):
+                output_func("Optional: select 1 2 3 4 5 6 for +0 three pairs; no Bank before reroll.")
+            result = _ask_for_selection(state, roll, input_func, output_func)
+            if result == "quit":
                 output_func("Practice ended.")
                 return state.match_score
+
+            if result == "ordinary_pairs":
+                continue
 
             action = _ask_to_roll_or_bank(state, input_func, output_func)
             if action == "quit":
@@ -106,6 +130,9 @@ def run_practice(input_func=input, output_func=print, random_source=None):
                 break
 
         match_score = state.match_score
+        if state.has_won:
+            output_func(f"VICTORY! Practice target reached. Final banked score: {match_score}")
+            return match_score
         command = input_func("Press Enter for another turn, or Q to quit: ").strip().lower()
         if command in ("q", "quit"):
             output_func(f"Final banked score: {match_score}")

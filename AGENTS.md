@@ -1,12 +1,23 @@
 # AGENTS.md
 
-> Document version: 2.0
+> Document version: 2.1
 >
-> Updated: 14 September 2026
+> Updated: 21 September 2026
 >
-> Status: Hot dice enabled; AI score-ambition banking confirmed.
+> Status: Revised scoring implemented in single-player practice; AI excluded from this implementation stage.
 
 ## Confirmed decisions in this revision
+
+- The 21 September design merge replaces the earlier scoring values: three 1s
+  score 500; each matching die beyond three adds 200; straights score 500/600/1200.
+- Ordinary three pairs are an explicit +0 six-die reroll, preserving earlier
+  turn points; consecutive pairs have dedicated scores. See `docs/game_rules.md`.
+- Current code and tests implement the revised base rules in single-player
+  practice, including pair rerolls and a banked 2,000-point victory target.
+- The current user-authorized implementation excludes all AI. The AI rules
+  below remain future V1 design, not requirements for this practice release.
+- V1 uses the reference's Easy AI; Normal/Hard and stochastic action sampling
+  are not authorized V1 implementation requirements.
 
 - Hot dice are active in Version 1. After all six dice score, all six become
   available to roll again while the accumulated turn score remains at risk.
@@ -72,11 +83,13 @@ rules independent from the display layer and retain a testable core.
 
 - A turn starts by rolling six dice.
 - A successful roll requires the player to select at least one valid scoring
-  die or complete combination from that roll.
+  die or complete combination from that roll, or explicitly activate ordinary
+  three pairs for a +0 six-die reroll.
 - Selected points are added to the unbanked turn score.
 - Banking transfers all unbanked points to the match score and ends the turn.
-- A roll with no valid scoring result is a bust: the entire unbanked turn score
-  is lost, the match score is unchanged, and the turn ends.
+- A roll with no positive scoring choice and no ordinary three-pair action is
+  a bust: the entire unbanked turn score is lost, the match score is unchanged,
+  and the turn ends.
 - Combinations must be formed within one roll; never combine dice from separate
   rolls.
 - Unbanked points cannot win a match. A side reaches the target only by banking.
@@ -90,7 +103,7 @@ The initial scoring validator must support:
 |---|---:|
 | Single 1 | 100 |
 | Single 5 | 50 |
-| Three 1s | 1,000 |
+| Three 1s | 500 |
 | Three 2s | 200 |
 | Three 3s | 300 |
 | Three 4s | 400 |
@@ -98,13 +111,18 @@ The initial scoring validator must support:
 | Three 6s | 600 |
 
 After this validator is reliable and tested, enable the four-to-six-of-a-kind
-and straight rules documented in `docs/game_rules.md`.
+and straight rules, then ordinary three pairs and consecutive pairs, as
+documented in `docs/game_rules.md`. Never use zero points alone to mean an
+invalid action: ordinary three pairs are legal and immediately reroll six dice.
 
 ## AI rules
 
 Each opponent has a score ambition, meaning the unbanked score at which it
 banks.
 
+- Select the legal action with the highest immediate score; resolve ties with
+  a fixed position order documented and tested during implementation. If only
+  ordinary three pairs are legal, activate their reroll.
 - Bank when the unbanked turn score reaches or exceeds the configured score
   ambition.
 - Continue rolling while below the score ambition.
@@ -186,7 +204,9 @@ adopts another test runner.
 
 Test at minimum:
 
-- every supported scoring combination and invalid selection;
+- every revised scoring combination and invalid selection;
+- ordinary three-pair +0 rerolls, preserved turn score, repeated activation,
+  optional positive subsets, and consecutive-pair priority;
 - combinations being rejected across separate rolls;
 - banking and bust state transitions;
 - hot dice returning all six dice while preserving the unbanked score;

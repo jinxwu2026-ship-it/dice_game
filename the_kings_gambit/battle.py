@@ -1,15 +1,10 @@
-"""Coordination for one roll; full matches and AI are not implemented yet."""
+"""Single-player turn coordination; no opponent or AI decisions."""
 
 from the_kings_gambit.models import TurnState
-from the_kings_gambit.scoring import is_bust, score_selection
+from the_kings_gambit.scoring import is_bust, selection_action
 
 
-def resolve_roll(state, roll, selected_positions=None):
-    """Apply one roll to a turn and return its result.
-
-    A bust ends the turn immediately. Otherwise, the selected positions must
-    form a valid score before the state is changed.
-    """
+def _validate_roll(state, roll):
     if not isinstance(state, TurnState):
         raise ValueError("state must be a TurnState")
     if not state.is_active:
@@ -17,13 +12,36 @@ def resolve_roll(state, roll, selected_positions=None):
     if not isinstance(roll, list) or len(roll) != state.dice_available:
         raise ValueError("roll must contain every currently available die")
 
-    # Bust must be checked before asking for a selection because there is no
-    # legal selection to make from a bust roll.
+
+def begin_roll(state, roll):
+    """Commit a new roll, disabling bank until a positive selection is made."""
+    _validate_roll(state, roll)
+    if state.phase not in ("ready", "decision"):
+        raise ValueError("select from the pending roll before rolling again")
+    bust = is_bust(roll)  # Validate values before changing state.
+    if bust:
+        state.bust()
+        return "bust"
+    state.current_roll = list(roll)
+    state.phase = "select"
+    return "select"
+
+
+def resolve_roll(state, roll, selected_positions=None):
+    """Resolve a pending roll, or commit and resolve one supplied new roll.
+
+    Invalid choices never change state. A pending roll cannot be replaced.
+    Without a pending roll, each call submits a new roll, not leftover dice.
+    """
+    _validate_roll(state, roll)
+    if state.phase == "select" and roll != state.current_roll:
+        raise ValueError("select dice from the current roll only")
     if is_bust(roll):
         state.bust()
         return "bust"
-
-    # score_selection validates everything before add_selection changes state.
-    # An invalid choice therefore leaves the turn exactly as it was.
-    score = score_selection(roll, selected_positions)
-    return state.add_selection(score, len(selected_positions))
+    action = selection_action(roll, selected_positions)
+    if state.phase != "select":
+        begin_roll(state, roll)
+    if action["action_type"] == "ordinary_pairs":
+        return state.activate_pairs()
+    return state.add_selection(action["score_delta"], len(selected_positions))

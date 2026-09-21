@@ -1,183 +1,221 @@
-# The King's Gambit: Dice Game Rules
+# The King's Gambit: Dice Game Rules / 骰子游戏规则
 
-## 1. Purpose and source
+> 更新：2026-09-21。以下为合并后的目标规则，替代旧版 KCD2 风格分值。
+> 当前单人练习模式已实现以下基础计分、三对、Hot Dice、Bust 与 Bank 规则。
+> Bank 总分达到 2,000 时练习胜利；本阶段按用户要求不实现 AI、换手对战或五关流程。
 
-The dice game in *The King's Gambit* uses the basic Dice/Farkle rules found in
-*Kingdom Come: Deliverance II*, adapted to the five-encounter structure in
-[`game_design.md`](game_design.md).
+基础骰池为六颗公平六面骰，默认目标为 2,000 分；玩家与对手交替行动。
+仅 Bank 后的总分可判胜，到达或超过目标立即结束对局，不给对手追加回合。
+遗物、特殊骰与对手能力必须另行说明，不能混入基础计分。
+选骰只能使用当前掷骰的位置，不允许跨次掷骰拼组合。
 
-The central decision is always:
+## 1. 设计目标
 
-> Bank the points earned during this turn, or roll again for more points and
-> risk losing the entire unbanked turn score?
+本游戏采用 Push-your-luck（得分后选择收手或继续冒险）结构。玩家在自己的回合中反复执行：
 
-This document defines the normal rules before relics, special dice, opponent
-abilities, or other modifiers are applied.
+1. 掷出当前骰池。
+2. **玩家先选择要取走的骰子。**
+3. 程序只对玩家选中的骰子进行合法性检查和计分。
+4. 玩家选择将本回合分数存入总分（Bank），或用剩余骰子继续掷。
+5. 若一次掷骰没有任何合法得分选择，也不能发动普通三对，则 Bust；本回合尚未 Bank 的分数全部清零，轮到对手。
 
-## 2. Match objective
+任一玩家 Bank 后总分达到或超过 `2000`，立即获胜。
 
-- A match is played between the player and one opponent.
-- The player and opponent take alternating turns.
-- The first side to reach the match target wins the encounter.
-- The Version 1 target is **2,000 points**, unless encounter balancing later
-  assigns a different target to a particular opponent.
-- Points earned during a turn are unbanked. They do not become part of the
-  player's match score until the player banks them.
+这一流程必须保留“先选择、后判分”的原则。程序可以向玩家展示可选方案，但不能擅自替玩家拿走即时分数最高的骰子，因为少拿分、保留更多骰子有时具有更高的长期价值。
 
-## 3. Turn sequence
+## 2. 完整计分表
 
-1. Start the turn with an unbanked turn score of 0.
-2. Roll all six available dice.
-3. If the roll contains no scoring die or scoring combination, the player
-   busts. The turn ends and all unbanked points from that turn are lost.
-4. Otherwise, select at least one valid scoring die or combination from the
-   current roll.
-5. Add the selected score to the unbanked turn score and set the selected dice
-   aside.
-6. Choose one of the following actions:
-   - **Bank:** add the unbanked turn score to the match score and end the turn.
-   - **Roll again:** roll only the dice that were not set aside and continue
-     the same turn.
-7. After a turn ends, the opponent takes a turn under the same base rules.
+### 2.1 单骰
 
-A player may select more than one independent scoring group from the same
-roll. For example, `1, 4, 4, 4, 5, 6` may score the single 1, three 4s, and the
-single 5 for a total of 550 points.
-
-Scoring combinations cannot be assembled across separate rolls. For example,
-two 4s set aside from one roll cannot be combined with a 4 from a later roll
-to make three 4s.
-
-## 4. Scoring
-
-### 4.1 Single scoring dice
-
-| Dice | Score |
+| 骰子 | 分数 |
 |---|---:|
-| Single 1 | 100 |
-| Single 5 | 50 |
+| 单个 `1` | 100 |
+| 单个 `5` | 50 |
+| 单个 `2`、`3`、`4`、`6` | 0，不能单独选择 |
 
-Single 2s, 3s, 4s, and 6s do not score.
+多个未被其他组合消耗的 `1` 和 `5` 可以逐颗累加。例如，选择 `1 1 5` 得 `250` 分。
 
-### 4.2 Three of a kind
+### 2.2 三同号
 
-| Combination | Score |
+| 组合 | 分数 |
 |---|---:|
-| Three 1s | 1,000 |
-| Three 2s | 200 |
-| Three 3s | 300 |
-| Three 4s | 400 |
-| Three 5s | 500 |
-| Three 6s | 600 |
+| `111` | 500 |
+| `222` | 200 |
+| `333` | 300 |
+| `444` | 400 |
+| `555` | 500 |
+| `666` | 600 |
 
-### 4.3 Four, five, or six of a kind
+### 2.3 四同号及以上
 
-Every matching die beyond the third doubles the combination's score.
+同号组合必须作为一个整体计分。从三同号开始，每多一颗同点数骰子固定增加 `200` 分：
 
-| Face | Three | Four | Five | Six |
+\[
+Score(v,k)=TripleScore(v)+(k-3)\times 200,\quad k\in\{3,4,5,6\}
+\]
+
+| 点数 | 三同号 | 四同号 | 五同号 | 六同号 |
 |---:|---:|---:|---:|---:|
-| 1 | 1,000 | 2,000 | 4,000 | 8,000 |
-| 2 | 200 | 400 | 800 | 1,600 |
-| 3 | 300 | 600 | 1,200 | 2,400 |
-| 4 | 400 | 800 | 1,600 | 3,200 |
-| 5 | 500 | 1,000 | 2,000 | 4,000 |
-| 6 | 600 | 1,200 | 2,400 | 4,800 |
+| 1 | 500 | 700 | 900 | 1100 |
+| 2 | 200 | 400 | 600 | 800 |
+| 3 | 300 | 500 | 700 | 900 |
+| 4 | 400 | 600 | 800 | 1000 |
+| 5 | 500 | 700 | 900 | 1100 |
+| 6 | 600 | 800 | 1000 | 1200 |
 
-### 4.4 Straights
+例如，`1111` 固定为 `700`，不能拆成 `111 + 1 = 600`；`5555` 固定为 `700`，不能拆成 `555 + 5 = 550`。
 
-| Combination | Score |
+### 2.4 顺子
+
+| 组合 | 分数 |
 |---|---:|
-| `1, 2, 3, 4, 5` | 500 |
-| `2, 3, 4, 5, 6` | 750 |
-| `1, 2, 3, 4, 5, 6` | 1,500 |
+| `1-2-3-4-5` | 500 |
+| `2-3-4-5-6` | 600 |
+| `1-2-3-4-5-6` | 1200 |
 
-All dice in a straight must occur in the same roll.
+顺子只消耗构成顺子的骰子。顺子之外剩余的 `1` 或 `5` 可以作为单骰叠加。例如，选择 `1 1 2 3 4 5` 可解释为 `12345 + 1`，得 `600` 分。
 
-## 5. Selection rules
+### 2.5 普通三对
 
-- At least one scoring die or complete scoring combination must be selected
-  after every successful roll.
-- A non-scoring die cannot be selected by itself.
-- An incomplete combination cannot be selected. For example, two 3s cannot be
-  set aside in the hope of completing three 3s on a later roll.
-- The player does not have to select every scoring die in a roll.
-- The score validator must calculate only the dice selected from the current
-  roll, not every scoring die that was rolled.
-- Once selected dice are scored and set aside, they are not rolled again during
-  that turn unless a later rule explicitly returns all dice to play.
+普通三对指六颗骰子恰好由三个不同点数的对子构成，但不属于下节列出的三连对，例如 `11 33 66` 或 `22 44 66`。
 
-## 6. Banking and busting
+- 直接分数：`0`。
+- 效果：玩家可选择放弃这次掷骰产生的所有直接分数，发动 Hot Dice，重新获得并投掷 6 颗骰子。
+- 本回合此前已累计的 Turn Score 保留。
+- 连续再次掷出普通三对时，可以再次发动，不设“每回合一次”限制。
+- 普通三对是一种可选功能组合，不强制覆盖玩家的其他合法选择。例如在 `11 33 66` 中，玩家可选两个 `1` 得 `200` 分并留下 4 颗骰子，也可选择整组六骰发动 `+0` 的 Hot Dice。
 
-### Banking
+### 2.6 三连对
 
-Banking transfers the entire unbanked turn score to the player's match score
-and ends the turn. Previously banked match points are never risked by rolling.
+三连对是三个点数连续的对子，使用全部 6 颗骰子：
 
-### Busting
+| 组合 | 分数 |
+|---|---:|
+| `11 22 33` | 1200 |
+| `22 33 44` | 1000 |
+| `33 44 55` | 1100 |
+| `44 55 66` | 1200 |
 
-A roll is a bust when none of the newly rolled dice can score under the active
-rules. On a bust:
+三连对是完整得分组合，不能在选中全部 6 颗时降级为“普通三对 +0”。由于六颗骰子全部计分，结算后同时触发 Hot Dice。
 
-- the current turn ends immediately;
-- the entire unbanked turn score becomes 0;
-- the banked match score is unchanged; and
-- play passes to the opponent.
+### 2.7 两组三同号
 
-## 7. Hot dice
+两组三同号没有额外奖励，按两组基础分相加。例如：
 
-Hot dice are enabled in Version 1. If all six dice have been scored during one
-turn, all six dice become available again. The player may either bank or
-continue the same turn by rolling all six dice. The accumulated unbanked turn
-score remains at risk, and a bust after the new roll loses that entire score.
+`111555 = 500 + 500 = 1000`
 
-Scoring all six dice does not bank points, end the turn, or grant a separate
-bonus.
+六颗骰子均被有效计分，因此正常触发 Hot Dice。其“全部计分后恢复六骰”已经构成隐性奖励，不再增加双三同号 Bonus。
 
-## 8. Opponent banking behaviour
+## 3. 判分优先级与边界规则
 
-Each opponent has a configured **score ambition**, also called its banking
-threshold. After selecting valid scoring dice, the opponent must:
+### 3.1 核心原则
 
-- bank when its unbanked turn score reaches or exceeds its score ambition;
-- continue rolling while below that score ambition; and
-- bank immediately whenever its banked match score plus its current unbanked
-  turn score reaches or exceeds the match target, regardless of its normal
-  score ambition.
+判分对象是**玩家选中的骰子集合**，不是本次掷出的全部骰子。一次合法选择必须能被完整分解为一个或多个互不重叠的合法计分单元；每颗选中骰子必须被且只能被一个计分单元消耗。
 
-The basic AI is deterministic apart from dice rolls. It does not use machine
-learning or hidden strategy rules.
+推荐判定顺序如下：
 
-## 9. Version 1 implementation scope
+1. 检查选中集合是否为六骰整体特殊组合：大顺子、三连对、普通三对。
+2. 从剩余骰子中识别五骰顺子。
+3. 识别三同号至六同号；同点数骰子按选中数量作为一个整体计分。
+4. 将未被组合消耗的 `1`、`5` 按单骰累加。
+5. 若仍有任何选中骰子无法计分，则整个选择非法。
 
-The initial scoring validator must support:
+实现时也可以枚举所有互不重叠的合法分解，但必须保证同一个骰子不重复得分，且完整组合优先于其内部的单骰得分。
 
-- single 1s;
-- single 5s; and
-- three of a kind.
+### 3.2 组合冲突
 
-Four-to-six of a kind and straights belong to the intended KCD2-inspired
-ruleset, but should be enabled only after the initial validator is reliable and
-covered by tests, as required by `game_design.md`.
+- `123456` 选中全部六骰时按大顺子 `1200` 结算，不叠加两个五骰顺子，也不额外计算其中的 `1`、`5`。
+- 三连对选中全部六骰时按其专属分数结算，不可改判为普通三对。
+- 普通三对只有在玩家选中整组六骰并主动发动时才生效；玩家仍可只选择其中可单独计分的 `1`、`5`。
+- 四同号及以上按整体表格计分，不能拆成三同号再叠加同点数的单骰。
+- 不同且互不重叠的普通组合可以相加，例如 `222 + 1 = 300`，`111 + 555 = 1000`。
+- 整体组合内部的 `1`、`5` 不重复计分；只有组合之外未被消耗的 `1`、`5` 才能叠加。
 
-Badges from *Kingdom Come: Deliverance II* are not part of the base rules.
-Relics, special dice, and opponent abilities in *The King's Gambit* may later
-modify these rules, but their effects must be documented separately and must
-not be embedded in the base scoring implementation.
+### 3.3 非法选择
 
-## 10. Examples
+以下情况应由程序拒绝，并要求玩家重新选择：
 
-| Roll | Selected dice | Score | Valid? |
-|---|---|---:|---|
-| `1, 2, 3, 4, 5, 6` | `1, 5` | 150 | Yes |
-| `2, 2, 2, 3, 4, 6` | `2, 2, 2` | 200 | Yes |
-| `1, 4, 4, 4, 5, 6` | `1, 4, 4, 4, 5` | 550 | Yes |
-| `2, 3, 3, 4, 6, 6` | none | 0 | Bust |
-| `3, 3, 4, 4, 5, 6` | `3, 3` | 0 | No; an incomplete triple cannot score |
+- 未选择任何骰子。
+- 选择单个或两个 `2`、`3`、`4`、`6`。
+- 合法组合之外又夹带不能计分的骰子，例如选择 `2224`。
+- 试图让同一颗骰子同时参与两个组合。
+- 试图把三连对当作普通三对发动 `+0` Hot Dice。
 
-## 11. References
+示例：
 
-- [GameSpot: KCD2 Farkle guide and scoring system](https://www.gamespot.com/gallery/kingdom-come-deliverance-2-dice-game-farkle-tips-guide/2900-6189/)
-- [GamesRadar+: KCD2 Dice rules and scoring combinations](https://www.gamesradar.com/games/action-rpg/kingdom-come-deliverance-2-dice-how-to-play/)
+| 掷骰 / 选择 | 结果 |
+|---|---|
+| 掷出 `333566`，选择 `5` | 合法，`50` 分，剩 5 骰 |
+| 掷出 `333566`，选择 `3335` | 合法，`350` 分，剩 2 骰 |
+| 掷出 `333566`，选择 `33356` | 非法，选中的 `6` 无法计分 |
+| 掷出 `112233`，选择全部 | 三连对，`1200` 分并 Hot Dice |
+| 掷出 `113366`，选择 `11` | 合法，`200` 分，剩 4 骰 |
+| 掷出 `113366`，选择全部并发动普通三对 | 合法，`+0` 并 Hot Dice |
 
-These references describe the source game's behaviour. Where this document
-differs, the project-specific rules and scope in this document take priority.
+### 3.4 Hot Dice 与 Bust
+
+- 若一次合法得分选择消耗了当前所有可用骰子，则玩家恢复到 6 颗骰子，并可继续本回合；此前 Turn Score 保留。
+- 普通三对是特殊的 `+0` Hot Dice：它不要求六颗骰子产生正分，但玩家必须明确选择发动。
+- Hot Dice 可以连续触发。
+- 若当前掷骰不存在任何正分合法选择，也不存在可发动的普通三对，则 Bust，本回合未 Bank 分数归零并换手。
+- 达到 `player_score + turn_score >= 2000` 时，Bank 立即获胜；AI 不应为追求更高分继续冒险。
+
+## 4. 回合状态与动作语义
+
+- 回合开始：Turn Score 为 0，先掷六骰；不能跳过掷骰直接 Bank。
+- 每次掷骰后先判断有无合法动作，再由行动方选择。非法输入只要求重新选择，
+  不扣分、不消耗骰子、不换手；不可因选错组合而判 Bust。
+- 每次掷骰提交一次选骰动作，然后进入 Bank / Roll 阶段；不能反复取同一掷骰
+  中的同号单骰来规避整体组合分值。玩家可以只取部分骰子，未取者下次重掷。
+- 正分选择耗尽当前可用骰子时恢复六骰，保留 Turn Score，可 Bank 或继续掷。
+  这也适用于此前已取走部分骰子、当前只剩一至五骰的情况。
+- 普通三对必须显式选择全部六骰发动；放弃的是本次直接得分，不是此前 Turn Score。
+  发动后的恢复六骰与重掷属于同一特殊动作（原文“重新获得并投掷”）；
+  不能把这次 +0 动作当作一个额外的 Bank 时机。连续普通三对允许继续发动。
+- Bank 转移全部 Turn Score 到 Match Score、清空 Turn Score，并结束回合；
+  若已到目标则结束比赛，否则换手。
+- Bust 清空 Turn Score，保留双方已 Bank 总分，立即换手。
+- 合法普通三对的 0 分必须与非法选择区分。Bust 应依据合法动作集合为空判断，
+  不能再用“最大得分等于 0”判断。
+
+## 5. V1 对手：固定 score ambition
+
+本节为后续设计，不属于当前无 AI 单人练习版本的实现范围。
+
+保留此前确认的确定性 AI；原文 Easy 与此兼容，Normal / Hard 仅作后续研究。
+
+1. 从共享计分引擎生成的合法动作中选择即时分数最高者。
+2. 同分时采用固定的位置顺序决胜；具体顺序在实现时记录并测试，禁止随机选择。
+3. 若无正分动作但存在普通三对，则发动 +0 重掷；没有任何合法动作才 Bust。
+4. 正分选骰结算后，若已 Bank 总分加 Turn Score 达到目标，立即 Bank。
+5. 否则，Turn Score 达到或超过对手配置的 score ambition 时 Bank，低于时继续掷。
+
+普通三对只能在掷骰后发动，而 AI 在前一个 Bank / Roll 决策点已检查胜利与
+score ambition，因此该特殊重掷不允许绕过已满足的 Bank 条件。
+高阶 AI 的剩余骰价值、风险人格、分差与残局威胁不得暗中改变 V1 固定阈值。
+五个对手的具体阈值尚待平衡测试；玩家与 AI 共用选择、计分、Bust 和 Hot Dice 规则。
+
+## 6. 实现顺序与验收
+
+先保证单骰与三同号可靠，再迁移四至六同号、顺子，最后加入普通三对和三连对。
+全部组合均属于目标规则；分阶段开发不意味着可用部分规则宣称 V1 完成。
+自动化测试至少覆盖：
+
+- 六种点数的三至六同号精确分值，单 1 / 5 与无分单骰。
+- 三种顺子、顺子外额外 1 / 5，以及禁止组合内重复计分。
+- 四种三连对的分值、Hot Dice，以及禁止降级为普通三对。
+- 普通三对 +0、已有 Turn Score 保留、六骰重掷、连续发动；
+  `224466` 不可误判 Bust，`113366` 仅选 `11` 得 200 并剩四骰。
+- 两组三同号相加且无额外奖励；`111555` 为 1000 并恢复六骰。
+- 空选择、重复或越界位置、非法类型、夹带无分骰与跨掷骰组合被拒绝且不改变状态。
+- 耗尽一至六颗当前可用骰均正常触发 Hot Dice；Bust 后清零、Bank 后转移与换手。
+- 仅 Bank 可赢、到达或超过 2000 立即结束；AI 阈值以下继续、等于或超过即 Bank、
+  未到阈值但可赢时 Bank、选骰同分时决策稳定。
+
+## 7. 来源与采用边界
+
+本次按用户要求将《骰子游戏计分规则与 AI 设计》的计分方案合并为项目规则。
+原文归档见 [scoring_and_ai_reference.md](scoring_and_ai_reference.md)，
+平衡分析、旧新规则对照及 AI 演化路线见 [game_design.md](game_design.md)。
+KCD2 / Farkle 是玩法灵感，不再是本项目数值标准。
+概率和策略模拟数据属于分析材料，不是执行时的规则或已通过的项目测试。
