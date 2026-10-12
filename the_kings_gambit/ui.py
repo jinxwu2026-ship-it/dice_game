@@ -1,15 +1,12 @@
-"""Command-line display and input for the dice practice mode."""
+"""ASCII display and input parsing; game rules live in the core modules."""
 
-from the_kings_gambit.battle import begin_roll, resolve_roll
-from the_kings_gambit.dice import roll_dice
-from the_kings_gambit.models import TurnState
-from the_kings_gambit.scoring import enumerate_legal_selections
+import os
+import sys
+import textwrap
 
 
 def parse_positions(text):
     """Convert comma- or space-separated text into integer positions."""
-    # Supporting both separators lets the player enter either "1 3 5" or
-    # "1, 3, 5" without adding rule logic to the UI.
     cleaned_text = text.replace(",", " ").strip()
     if not cleaned_text:
         raise ValueError("Enter at least one position.")
@@ -23,117 +20,95 @@ def parse_positions(text):
     return positions
 
 
-def _show_roll(roll, output_func):
-    """Display every die with its one-based selection position."""
-    positions = "  ".join(f" {position} " for position in range(1, len(roll) + 1))
-    dice = "  ".join(f"[{die}]" for die in roll)
-    output_func(f"Positions: {positions}")
-    output_func(f"Dice:      {dice}")
+def read_input(prompt, input_func=input):
+    """Treat EOF and Ctrl-C as a request to quit at any input prompt."""
+    try:
+        return input_func(prompt).strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        return "q"
 
 
-def _ask_for_selection(state, roll, input_func, output_func):
-    """Keep asking until the player enters a valid scoring selection."""
-    while True:
-        text = input_func("Select scoring dice by position (or Q to quit): ").strip()
-        if text.lower() in ("q", "quit"):
-            return "quit"
-
-        try:
-            positions = parse_positions(text)
-            # Store the old total so the UI can display how many points this
-            # particular selection added.
-            old_score = state.unbanked_score
-            result = resolve_roll(state, roll, positions)
-        except ValueError as error:
-            output_func(f"Invalid selection: {error}")
-            continue
-
-        points_gained = state.unbanked_score - old_score
-        output_func(f"Scored {points_gained} points.")
-        output_func(f"Unbanked score: {state.unbanked_score}")
-        if result == "hot_dice":
-            output_func("HOT DICE! All six dice are available again.")
-        if result == "ordinary_pairs":
-            output_func("THREE PAIRS: +0, earlier turn points kept. Rerolling six dice now.")
-        output_func(f"Dice available next: {state.dice_available}")
-        return result
+def _wrap_lines(lines, width):
+    """Wrap each panel's text separately, keeping empty rows."""
+    rows = []
+    for line in lines:
+        rows.extend(textwrap.wrap(line, width=width) or [""])
+    return rows
 
 
-def _ask_to_roll_or_bank(state, input_func, output_func):
-    """Return 'roll', 'bank', or 'quit' after a valid command."""
-    while True:
-        command = input_func("[R]oll again, [B]ank, or [Q]uit: ").strip().lower()
-        if command in ("r", "roll"):
-            return "roll"
-        if command in ("b", "bank"):
-            state.bank()
-            output_func(f"Banked! Match score: {state.match_score}")
-            return "bank"
-        if command in ("q", "quit"):
-            return "quit"
-        output_func("Invalid command. Enter R, B, or Q.")
+def render_gamebar(state, turn_number, roll, selected_positions, message, commands,
+                   match_scores=None, active_side="Player", score_ambition=None,
+                   first_turn=""):
+    """Build one text frame without changing state or calculating rules.
+
+    The battle controller supplies the available commands and result message.
+    Display the latest roll even after the core clears its pending roll.
+    """
+    width = 62
+    border = "+" + "-" * (width + 2) + "+"
+    lines = [
+        "THE KING'S GAMBIT - " + ("PLAYER VS EASY AI" if match_scores is not None
+                                  else "SINGLE-PLAYER PRACTICE"),
+        f"Turn: {turn_number}    Phase: {state.phase}",
+        f"Banked score: {state.match_score} / {state.target}",
+        f"Unbanked score (at risk): {state.unbanked_score}",
+        f"Dice available next: {state.dice_available}",
+        "",
+    ]
+    if match_scores is not None:
+        # Read the current side's live score; the match saves it at turn end.
+        scores = dict(match_scores)
+        scores[active_side] = state.match_score
+        lines[2:2] = [
+            f"Active side: {active_side}",
+            f"Player: {scores['Player']}    Opponent: {scores['Opponent']}",
+            f"Easy AI score ambition: {score_ambition}",
+        ]
+        if first_turn:
+            lines.insert(2, first_turn)
+    if roll:
+        lines.append("Positions: " + "  ".join(f" {i} " for i in range(1, len(roll) + 1)))
+        lines.append("Dice:      " + "  ".join(f"[{die}]" for die in roll))
+        # A caret stays under each selected die until the next roll.
+        lines.append("Selected:  " + "  ".join(
+            " ^ " if i in selected_positions else "   "
+            for i in range(1, len(roll) + 1)))
+    else:
+        lines.append("Dice: waiting for the first roll")
+    lines.extend([
+        "", f"Result: {message}", f"Actions: {commands}", "",
+        "Select by position, e.g. 1 3 5. Q / Ctrl-C exits.",
+    ])
+    rules = [
+        "SCORING RULES", "",
+        "Singles 1/5: 100/50. 111: 500; other triples: face x 100.",
+        "Extra matching dice: +200 each. Straights: 500/600/1200.",
+        "Consecutive pairs: 112233/223344/334455/445566",
+        "                  1200 / 1000 / 1100 / 1200.",
+        "Ordinary three pairs: select all six for +0 reroll.",
+    ]
+    # Stack two equal-width boxes so an ordinary 80-column terminal fits them.
+    frame = []
+    for panel in (rules, lines):
+        frame.append(border)
+        for row in _wrap_lines(panel, width):
+            frame.append("| " + row.ljust(width) + " |")
+        frame.append(border)
+    return "\n".join(frame)
 
 
-def run_practice(input_func=input, output_func=print, random_source=None):
-    """Run repeated single-player turns for manually testing the core rules."""
-    output_func("THE KING'S GAMBIT - DICE PRACTICE")
-    output_func("Select dice using positions such as: 1 3 5")
-    output_func("Only banked points are safe. Q exits practice mode.")
-    output_func("Target: 2000 banked points. No AI or opponents in this version.")
-    output_func("Singles: 1=100, 5=50. Triples: 111=500; others=face x 100.")
-    output_func("Each matching die beyond three adds 200. Straights: 500 / 600 / 1200.")
-    output_func("Consecutive pairs: 112233=1200, 223344=1000, 334455=1100, 445566=1200.")
-    output_func("Ordinary three pairs: select all six positions for +0 and an immediate reroll.")
+def show_gamebar(state, turn_number, roll, selected_positions, message,
+                 commands, output_func=print, refresh=None, match_scores=None,
+                 active_side="Player", score_ambition=None, first_turn=""):
+    """Refresh an interactive terminal; keep captured output readable.
 
-    original_input = input_func
-
-    def safe_input(prompt):
-        try:
-            return original_input(prompt)
-        except (EOFError, KeyboardInterrupt):
-            return "q"
-
-    input_func = safe_input
-
-    match_score = 0
-    while True:
-        state = TurnState(match_score)
-        output_func("\n--- New turn ---")
-
-        while state.is_active:
-            roll = roll_dice(state.dice_available, random_source)
-            output_func(f"\nRolling {state.dice_available} dice...")
-            _show_roll(roll, output_func)
-
-            # Bust rolls do not ask the player to choose dice.
-            if begin_roll(state, roll) == "bust":
-                output_func("BUST! All unbanked points were lost.")
-                output_func(f"Match score remains: {state.match_score}")
-                break
-
-            actions = enumerate_legal_selections(roll)
-            if any(action["action_type"] == "ordinary_pairs" for action in actions):
-                output_func("Optional: select 1 2 3 4 5 6 for +0 three pairs; no Bank before reroll.")
-            result = _ask_for_selection(state, roll, input_func, output_func)
-            if result == "quit":
-                output_func("Practice ended.")
-                return state.match_score
-
-            if result == "ordinary_pairs":
-                continue
-
-            action = _ask_to_roll_or_bank(state, input_func, output_func)
-            if action == "quit":
-                output_func("Practice ended.")
-                return state.match_score
-            if action == "bank":
-                break
-
-        match_score = state.match_score
-        if state.has_won:
-            output_func(f"VICTORY! Practice target reached. Final banked score: {match_score}")
-            return match_score
-        command = input_func("Press Enter for another turn, or Q to quit: ").strip().lower()
-        if command in ("q", "quit"):
-            output_func(f"Final banked score: {match_score}")
-            return match_score
+    Tests inject an output function, so they never clear the user's terminal.
+    Native cls/clear needs no terminal library or cursor-timing assumptions.
+    """
+    if refresh is None:
+        refresh = output_func is print and sys.stdout.isatty()
+    if refresh:
+        os.system("cls" if os.name == "nt" else "clear")
+    output_func(render_gamebar(state, turn_number, roll, selected_positions,
+                              message, commands, match_scores, active_side,
+                              score_ambition, first_turn))

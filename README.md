@@ -10,20 +10,32 @@ gamebar. Version 1 is designed to use only the Python standard library.
 
 ## Project status
 
-The dice-rule core and a single-player CLI practice mode are implemented and
-tested. Practice mode includes dice rolling, scoring, selection validation,
-busts, banking, and hot dice. AI, rewards, the shop, encounters, and the
-complete playable flow are not implemented yet.
+The dice-rule core, single-player practice and one Player-versus-Easy-AI match
+are implemented and tested. Both modes share scoring, selection validation,
+busts, banking, hot dice and a refreshed ASCII gamebar. Rewards, the shop, HP
+and the five-encounter run are not implemented yet.
 
 The revised scoring rules are implemented in the single-player practice mode:
 three 1s = 500, matching dice beyond three add 200, and straights = 500/600/1,200.
 Ordinary and consecutive three pairs, repeated hot dice, and legal zero-point
 actions are supported. Banking at least 2,000 points ends practice with victory.
-This version deliberately has no AI. Five-encounter progression, rewards, HP
-and the full gamebar remain future work; see [TODO.md](TODO.md).
+The opponent match alternates player and AI turns and ends immediately when
+either side banks at least 2,000 points. Five-encounter progression, rewards
+and HP remain future work; see [TODO.md](TODO.md).
+
+The single-player gamebar shows the turn number, phase, banked score and target,
+unbanked points, latest dice, selected positions, available dice, commands and
+result messages. It refreshes in place in an interactive terminal; redirected
+output and automated tests retain readable frames instead of clearing the screen.
+Scoring rules appear in a separate box at the top, immediately followed by
+the gamebar. Both boxes are 66 columns wide and fit a standard 80-column
+terminal without the wrapping caused by the earlier side-by-side layout.
 
 ## Basic game rules
 
+- Before each opponent match, one fair 0/1 roll chooses who starts:
+  0 = AI, 1 = Player. The gamebar keeps the result visible. It is not a scoring
+  die and is not repeated between turns. Solo practice skips this roll.
 - The player and opponent take alternating turns.
 - A turn begins by rolling six dice.
 - The player selects a valid scoring subset, or explicitly activates an ordinary
@@ -79,7 +91,12 @@ continues rolling while below this amount and banks once its unbanked score
 reaches or exceeds it. An opponent always banks immediately if doing so would
 win the match.
 
-V1 uses the highest immediate scoring legal action and a deterministic tie order.
+Easy AI uses the highest immediate scoring legal action. Equal-score choices
+use the lexicographically earliest ascending position list. The default
+score ambition is 500, a starting value for testing rather than final balance.
+Its rolls, selected positions, score gains, Hot Dice and Bank/Roll reasons are
+shown in sequence. Each action pauses for 2 seconds; Enter advances between
+completed turns. Ctrl-C exits during AI playback without banking risked points.
 Future utility and win-probability AI are research directions, not V1 requirements.
 The AI is intended to be deterministic and easy to understand. It does not use
 machine learning.
@@ -105,19 +122,56 @@ or a large inventory system.
 
 ## Running the game
 
-Run the practice mode from the project directory with:
+Run one match against Easy AI from the project directory with:
 
 ```powershell
 python main.py
 ```
 
-At the current project stage, this command starts a single-player dice practice
-mode rather than the complete five-encounter game.
+For the original single-player practice mode, use:
+
+```powershell
+python main.py --practice
+```
+
+To change the AI reading time and ambition, for example:
+
+```powershell
+python main.py --ai-delay 3 --ambition 500
+```
+
+`--ai-delay 0` removes timed pauses; completed turns still wait for Enter.
+The delay must be finite and non-negative; ambition must be a positive integer.
 
 Enter positions such as `1 3 5` to select dice, then `R` to roll or `B` to bank.
+After a completed turn, press Enter to start the next turn or Q to quit.
 For ordinary three pairs, selecting all six positions explicitly activates a
 zero-point reroll; there is no Bank prompt before that reroll. Selecting only
 scoring 1s/5s instead remains possible. `Q`, EOF, or Ctrl-C exits the practice.
+
+`battle.run_match()` and `battle.run_practice()` share the same turn loop.
+`models.MatchState` tracks both scores, the active side and winner. `ui.py` only renders
+frames and parses input; scoring and state changes stay in the core modules.
+
+## Match records / 对局记录
+
+`python main.py` automatically saves your opponent match as a UTF-8 text file
+in `match_logs/`, named by the local start time, for example
+`2026-10-08_15-30-20_123456.txt`. Microseconds distinguish starts within one
+second; existing records are never overwritten. The saved path is printed
+when the match ends or you quit.
+
+Each event records the turn number, acting side, dice in positional order,
+selected positions, available dice, phase, both banked scores, the acting
+side's current banked score and unbanked turn score. AI Bank/Roll reasons,
+Hot Dice, ordinary three pairs, Bust losses and the winner or early exit are
+included. Events are flushed immediately, so earlier actions survive an
+interruption. On quit, any displayed unbanked points are discarded, not banked.
+
+Only CLI opponent matches are saved. Practice and direct `run_match()` calls
+(including automated tests/simulations) do not create personal records.
+Logging tests use temporary directories, not `match_logs/`. Records remain
+local and are ignored by Git; there is no upload or automatic deletion.
 
 ## Running tests
 

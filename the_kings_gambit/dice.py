@@ -3,6 +3,16 @@
 import random
 
 
+def roll_first_turn(random_source=None):
+    """Roll 0 or 1 once per match: 0 means AI, 1 means Player.
+
+    This opening roll is separate from the six scoring dice.
+    """
+    if random_source is None:
+        random_source = random
+    return random_source.randint(0, 1)
+
+
 def roll_dice(number_of_dice=6, random_source=None):
     """Return a list containing ``number_of_dice`` random values from 1 to 6.
 

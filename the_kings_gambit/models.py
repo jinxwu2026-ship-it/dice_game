@@ -28,7 +28,7 @@ class TurnState:
 
     @property
     def has_won(self):
-        """Only banked points can meet the practice target."""
+        """Only banked points can meet the match target."""
         return self.match_score >= self.target
 
     def add_selection(self, selection_score, number_of_selected_dice):
@@ -99,3 +99,34 @@ class TurnState:
         self.is_active = False
         self.phase = "ended"
         self.current_roll = None
+
+
+class MatchState:
+    """Keep each side's banked score and choose whose turn comes next."""
+
+    def __init__(self, against_ai=True, target=2000):
+        # Reuse the turn's target validation rather than defining another rule.
+        self.target = TurnState(target=target).target
+        self.scores = {"Player": 0, "Opponent": 0}
+        self.active_side = "Player"
+        self.starting_roll = None  # Practice needs no opening roll.
+        self.turn_number = 1
+        self.against_ai = against_ai
+        self.winner = None
+
+    def start_turn(self):
+        if self.winner is not None:
+            raise ValueError("the match has already ended")
+        return TurnState(self.scores[self.active_side], self.target)
+
+    def finish_turn(self, state):
+        """Save banked points, check victory, then alternate if necessary."""
+        if self.winner is not None or state.is_active:
+            raise ValueError("finish an active turn before changing sides")
+        self.scores[self.active_side] = state.match_score
+        if state.has_won:
+            self.winner = self.active_side
+            return
+        if self.against_ai:
+            self.active_side = "Opponent" if self.active_side == "Player" else "Player"
+        self.turn_number += 1

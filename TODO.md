@@ -22,10 +22,13 @@ resolved for Version 1 of *The King's Gambit*.
   banking before selecting or between ordinary three-pair activation and reroll.
 - [x] End single-player practice when banking reaches or exceeds 2,000;
   test exact-target and overshoot victories, malformed input, EOF and Ctrl-C.
-- [ ] Implement shared-action Easy AI (future work, excluded from this release)
-  with highest immediate scoring selection;
-  document a fixed tie order and test it. Configure and balance five ambitions.
-- [ ] Test ambition banking, winning-bank priority, match and run progression.
+- [x] Implement one shared-action Easy AI with highest immediate scoring selection;
+  document and test lexicographically earliest positional tie-breaking.
+- [x] Test ambition banking, winning-bank priority, alternating turns and both
+  match outcomes; show and pace AI rolls, selections and decisions.
+- [ ] Configure and balance five ambitions. The single opponent's 500-point
+  default is a starting value for manual testing, not final encounter balance.
+- [ ] Implement and test five-encounter run progression.
 - [ ] Reproduce probability and strategy claims before using them for balance:
   record rule version, action phases, seed, sample count, error and solver convergence.
 - [ ] Evaluate Normal/Hard only after the basic version, with an explicit scope
@@ -33,6 +36,8 @@ resolved for Version 1 of *The King's Gambit*.
 
 ## Game rules
 
+- [x] Roll 0/1 once at the start of each opponent match (0 = AI, 1 = Player);
+  display the result and test both starts, subsequent turns and unchanged practice.
 - [x] Define the base dice-scoring values and turn flow.
   See [`docs/game_rules.md`](docs/game_rules.md).
 - [x] Confirm whether using all six dice for scoring activates "hot dice" and
@@ -51,10 +56,19 @@ resolved for Version 1 of *The King's Gambit*.
 
 ## Project guidance
 
+- [x] Save only CLI opponent matches as timestamped UTF-8 text in `match_logs/`;
+  record dice, decisions/reasons, banked/unbanked scores and outcomes. Flush
+  events, preserve prior files and keep automated tests out of personal logs.
 - [x] Add project-specific instructions to `AGENTS.md`.
-- [x] Add the exact command for running the automated tests. Add the final game
-  command after the playable entry point exists.
+- [x] Document `python main.py` for an opponent match, `--practice` for solo
+  practice, AI ambition/delay options and the automated test command.
+- [x] Move single-player turn orchestration from UI to `battle.py`.
+- [x] Add a refreshed single-player ASCII gamebar with turn/phase, scores,
+  target, dice, selected positions, available dice, commands and result messages.
+- [x] Test gamebar state transitions, wrapping, refresh behavior and exit handling.
+- [x] Place scoring help in a separate equal-width box above the gamebar;
+  replace the side-by-side layout to fit standard 80-column terminals.
 - [ ] Keep the ASCII UI, input handling, scoring rules, battle flow, and run
   progression in separate modules as described in `docs/game_design.md`.
-- [x] Add tests for the pre-merge dice-rule core (new-rule migration remains open above): scoring, selection validation,
+- [x] Add tests for the revised dice-rule core: scoring, selection validation,
   banking, busts, malformed values, and hot-dice state transitions.

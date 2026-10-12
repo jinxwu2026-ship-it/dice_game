@@ -1,10 +1,10 @@
 # AGENTS.md
 
-> Document version: 2.1
+> Document version: 2.4
 >
-> Updated: 21 September 2026
+> Updated: 8 October 2026
 >
-> Status: Revised scoring implemented in single-player practice; AI excluded from this implementation stage.
+> Status: One player-versus-Easy-AI match implemented with visible paced decisions; rewards and progression deferred.
 
 ## Confirmed decisions in this revision
 
@@ -14,8 +14,20 @@
   turn points; consecutive pairs have dedicated scores. See `docs/game_rules.md`.
 - Current code and tests implement the revised base rules in single-player
   practice, including pair rerolls and a banked 2,000-point victory target.
-- The current user-authorized implementation excludes all AI. The AI rules
-  below remain future V1 design, not requirements for this practice release.
+- Single-player turn coordination now lives in `battle.py`; `ui.py` renders
+  the refreshed ASCII gamebar and parses input (implemented 6 October 2026).
+- The 7 October user request authorizes one simple Easy AI opponent match.
+  Decisions are visible in the gamebar; rewards, shops, HP and five encounters
+  remain outside this implementation stage. Practice remains available.
+- The current opponent defaults to score ambition 500 (a starting value,
+  not final five-opponent balance), with a 2-second pause per action.
+  CLI options `--ambition` and `--ai-delay` adjust these values.
+- Each opponent match starts with one fair 0/1 roll: 0 means AI first,
+  1 means Player first. Show the result in the gamebar; practice stays Player-only.
+- CLI opponent matches write local UTF-8 `.txt` event records in `match_logs/`,
+  named by the local start timestamp. Record dice, selections, AI reasons and
+  banked/unbanked scores; flush each event. Practice and direct core calls do
+  not create personal logs. File handling lives in `main.py`, not the UI/scorer.
 - V1 uses the reference's Easy AI; Normal/Hard and stochastic action sampling
   are not authorized V1 implementation requirements.
 
@@ -81,6 +93,8 @@ rules independent from the display layer and retain a testable core.
 
 ## Core game rules
 
+- Roll 0/1 once before the first turn of each opponent match to choose the
+  starting side (0 = AI, 1 = Player). It is not a scoring die.
 - A turn starts by rolling six dice.
 - A successful roll requires the player to select at least one valid scoring
   die or complete combination from that roll, or explicitly activate ordinary
@@ -121,7 +135,7 @@ Each opponent has a score ambition, meaning the unbanked score at which it
 banks.
 
 - Select the legal action with the highest immediate score; resolve ties with
-  a fixed position order documented and tested during implementation. If only
+  the lexicographically earliest ascending position tuple. If only
   ordinary three pairs are legal, activate their reroll.
 - Bank when the unbanked turn score reaches or exceeds the configured score
   ambition.
@@ -209,9 +223,12 @@ Test at minimum:
   optional positive subsets, and consecutive-pair priority;
 - combinations being rejected across separate rolls;
 - banking and bust state transitions;
+- both opening-roll outcomes, one opening roll per match, and unchanged practice;
 - hot dice returning all six dice while preserving the unbanked score;
 - the AI banking at its score ambition;
 - the AI banking when it can win;
+- match records for decisions, score changes, victory and quitting; logging tests
+  use temporary directories and must not populate the user's `match_logs/`;
 - match victory, encounter loss, HP reaching zero, and boss victory;
 - reward, shop, gold, healing, and relic effects once implemented; and
 - malformed input without application crashes.
@@ -228,6 +245,9 @@ python -m unittest discover -s tests
 
 If the actual entry point or test command changes, update this file and the
 README.
+
+`python main.py` starts one player-versus-Easy-AI match. Use
+`python main.py --practice` for the original single-player mode.
 
 ## Completion standard
 

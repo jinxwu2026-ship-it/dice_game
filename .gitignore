@@ -3,3 +3,4 @@ __pycache__/
 .vscode/
 .env
 .codex
+match_logs/*.txt

@@ -1,4 +1,4 @@
-"""Run the command-line practice mode."""
+"""Run the command-line game."""
 
 from the_kings_gambit.main import main
 
