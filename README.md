@@ -35,6 +35,8 @@ Before continuing, make sure the current folder contains `main.py`,
 
 ## Install and run
 
+**Recommended: play the GUI version for a better experience, with clickable dice, roll animations and illustrated rules.**
+
 Prefer the terminal? [Run the CLI version](#terminal-option) — no external packages required.
 
 Install **Python 3.10 or newer** (tested with Python 3.12.10).
@@ -258,6 +260,8 @@ cd dice_game
 请将这些文件保留在一起。
 
 ## 安装依赖并运行
+
+**推荐使用 GUI 图形界面版，获得更好的游戏体验：支持点击选骰、掷骰动画和图示规则。**
 
 想直接使用终端？[跳转到 CLI 版运行说明](#终端运行方式)，无需安装第三方依赖。
 

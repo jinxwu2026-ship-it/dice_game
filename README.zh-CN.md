@@ -35,6 +35,8 @@ cd dice_game
 
 ## 安装依赖并运行
 
+**推荐使用 GUI 图形界面版，获得更好的游戏体验：支持点击选骰、掷骰动画和图示规则。**
+
 想直接使用终端？[跳转到 CLI 版运行说明](#终端运行方式)，无需安装第三方依赖。
 
 安装 **Python 3.10 或更新版本**，当前验证环境为 Python 3.12.10。
@@ -241,6 +243,8 @@ Before continuing, make sure the current folder contains `main.py`,
 `requirements-gui.txt`, `the_kings_gambit/` and `assets/`. Keep these files together.
 
 ## Install and run
+
+**Recommended: play the GUI version for a better experience, with clickable dice, roll animations and illustrated rules.**
 
 Prefer the terminal? [Run the CLI version](#terminal-option) — no external packages required.
 
