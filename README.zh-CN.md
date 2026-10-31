@@ -35,6 +35,8 @@ cd dice_game
 
 ## 安装依赖并运行
 
+想直接使用终端？[跳转到 CLI 版运行说明](#终端运行方式)，无需安装第三方依赖。
+
 安装 **Python 3.10 或更新版本**，当前验证环境为 Python 3.12.10。
 窗口版需要 **pygame-ce 2.5.8**。下面的命令会创建本地虚拟环境并安装依赖，无需手动激活环境。
 
@@ -239,6 +241,8 @@ Before continuing, make sure the current folder contains `main.py`,
 `requirements-gui.txt`, `the_kings_gambit/` and `assets/`. Keep these files together.
 
 ## Install and run
+
+Prefer the terminal? [Run the CLI version](#terminal-option) — no external packages required.
 
 Install **Python 3.10 or newer** (tested with Python 3.12.10).
 The window version uses **pygame-ce 2.5.8**; the commands below install it in a
