@@ -150,6 +150,44 @@ Boss 胜利至少提供一颗 Gold 奖励骰；如果已赢得 Gold 赌注，不
 实际冒险会在 `match_logs/` 生成按开始时间命名的 UTF-8 `.txt` 记录，仅保存在你的电脑上，Git 会忽略它们。
 退出即结束当前冒险，不支持中途存档恢复。当前版本未加入背景音乐。
 
+## 项目结构与设计
+
+窗口版和终端版共用同一套流程控制器与游戏规则。
+界面负责提交命令和展示结果，计分留在核心模块。
+窗口版通过 `gui_session.py` 在显示界面和游戏工作线程之间传递命令及隔离的状态快照。
+
+```mermaid
+flowchart TD
+    UI["显示与输入：gui.py / ui.py"] <-->|"命令与展示数据"| Control["冒险与回合流程：progression.py / battle.py"]
+    Control --> Rules["规则与 AI：dice.py / scoring.py / ai.py"]
+    Control <--> State["游戏状态：models.py"]
+    Control --> Score["最终表现分：run_score.py"]
+```
+
+```text
+main.py                         # 应用启动入口
+requirements-gui.txt            # 可选 pygame-ce 依赖
+the_kings_gambit/
+|-- main.py                     # 启动参数、日志与排行榜读取
+|-- gui.py                      # 窗口绘制与鼠标/键盘输入
+|-- gui_session.py              # 窗口与游戏控制器之间的通信
+|-- ui.py                       # 终端面板与命令解析
+|-- progression.py              # 五场战斗、赌注、事件、奖励与商店
+|-- battle.py                   # 玩家与 AI 回合协调
+|-- models.py                   # 骰子、回合、战斗与冒险状态
+|-- dice.py                     # 支持注入随机源的加权投掷
+|-- scoring.py                  # 合法选择与计分
+|-- ai.py                       # Normal 人格与效用计算
+|-- run_score.py                # 根据冒险历史计算最终表现分
+`-- simulation.py               # 无界面 AI 对战实验
+assets/
+|-- gui/                        # 游戏使用的插图
+`-- readme/                     # 本说明的封面与界面图
+```
+
+以选骰为例：界面先显示预览；确认后，由共用控制器验证选择并计分，更新回合状态，再将结果交回界面。
+Bank 将本回合分数转入战斗总分，Bust 清空本回合风险分。因此，更换显示方式不会改变这些游戏规则。
+
 ## 终端运行方式
 
 完整五场流程也可仅使用 Python 标准库运行：
@@ -162,10 +200,20 @@ macOS/Linux 使用 `python3`。输入 `1 3 5` 等骰子位置，然后 `R` 继�
 完整回合结束后按 Enter 继续，`Q` 退出。
 特殊符号显示异常时使用 `--ascii`；`--ai-delay 0` 可取消 AI 阅读停顿。
 
-共用规则位于 `scoring.py`、`models.py`、`battle.py`；`progression.py` 管理五场冒险。
-可选窗口界面由 `gui.py` 和 `gui_session.py` 实现，依赖列于 `requirements-gui.txt`。
 设计文档、测试、分析工具和个人历史仅保留在本地开发目录；公开仓库只包含运行文件、
 README 插图、说明文档和依赖文件。
+
+## 设计灵感
+
+本项目受到《天国：拯救 2》骰子小游戏的启发，通过五场冒险、装备选择和不同 AI 人格，
+围绕一个核心选择展开：继续冒险，还是保住已有分数。
+
+## 再来一投？
+
+感谢你试玩 *The King's Gambit*。搭好自己的六骰阵容，找到适合你的收手时机，看看最终能带回多少分。
+欢迎分享你对操作、骰子选择和风险决策的体验。
+
+**骰子在你手中，决定也在你手中。继续 Roll，还是 Bank？🎲**
 
 </div>
 </details>
@@ -317,6 +365,48 @@ Actual runs create timestamped UTF-8 `.txt` records in `match_logs/`.
 Records stay on your computer and are ignored by Git. Quitting ends the current run;
 there is no mid-run save/resume. Music is not included in this version.
 
+## Project structure and design
+
+The window and terminal share the same gameplay controllers and rules.
+The interface sends commands and displays results; scoring stays in the core.
+For the window, `gui_session.py` carries commands and copied state snapshots
+between the display and the game worker.
+
+```mermaid
+flowchart TD
+    UI["Display and input: gui.py / ui.py"] <-->|"Commands and display data"| Control["Run and turn flow: progression.py / battle.py"]
+    Control --> Rules["Rules and AI: dice.py / scoring.py / ai.py"]
+    Control <--> State["Game state: models.py"]
+    Control --> Score["Final performance score: run_score.py"]
+```
+
+```text
+main.py                         # Launch the application
+requirements-gui.txt            # Optional pygame-ce dependency
+the_kings_gambit/
+|-- main.py                     # Startup options, logs and leaderboard loading
+|-- gui.py                      # Window drawing and mouse/keyboard input
+|-- gui_session.py              # Window/controller communication
+|-- ui.py                       # Terminal panels and command parsing
+|-- progression.py              # Five battles, wagers, events, rewards and shop
+|-- battle.py                   # Player and AI turn coordination
+|-- models.py                   # Dice, turn, match and run state
+|-- dice.py                     # Weighted rolls with injectable randomness
+|-- scoring.py                  # Legal selections and scoring
+|-- ai.py                       # Normal personalities and utility calculations
+|-- run_score.py                # Final score derived from run history
+`-- simulation.py               # Headless AI-versus-AI experiments
+assets/
+|-- gui/                        # Artwork used by the game
+`-- readme/                     # Cover and screenshots for this guide
+```
+
+For example, selecting dice first creates a preview. Confirming asks the shared
+controller to validate and score the selection, updates the turn state, then
+returns the result to the interface. Bank transfers the turn's points into the
+match score; Bust clears the turn's points. Changing the display does not change
+those rules.
+
 ## Terminal option
 
 The complete five-battle run also works with the Python standard library alone:
@@ -329,12 +419,23 @@ On macOS/Linux use `python3`. Enter dice positions such as `1 3 5`, then `R` to 
 or `B` to bank. Press Enter after completed turns; `Q` quits.
 Use `--ascii` if special symbols do not display correctly, or `--ai-delay 0` to remove AI reading pauses.
 
-The shared rules live in `scoring.py`, `models.py` and `battle.py`;
-`progression.py` controls the five-battle run. The optional GUI is in `gui.py` and
-`gui_session.py`, and `requirements-gui.txt` lists its dependency.
 Design notes, tests, analysis tools and personal histories stay in the local
 development workspace; the public repository includes only runtime files,
 README illustrations, guides and dependencies.
+
+## Inspiration
+
+The dice minigame in *Kingdom Come: Deliverance II* inspired this project.
+The five-battle run, equipment choices and different AI personalities build on
+the decision at its heart: keep rolling, or bank what you have.
+
+## One more roll?
+
+Thanks for trying *The King's Gambit*. Build a lineup, find your own stopping
+point, and see what score you can bring home. Feedback on the controls, dice
+choices and risky decisions is welcome.
+
+**Your dice. Your decision. Roll or bank? 🎲**
 
 </div>
 </details>
