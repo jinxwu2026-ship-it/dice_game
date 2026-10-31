@@ -1,19 +1,45 @@
-# The King's Gambit
+<h1 align="center">The King's Gambit</h1>
 
-**English** | [简体中文](README.zh-CN.md)
+<p align="center">
+  <img src="assets/readme/cover.png" width="300" alt="Dice, candlelight and treasure in a medieval tavern">
+</p>
 
-Roll for more points, or bank before you lose them. Play the full five-battle
-dice roguelite in a window or in the terminal.
+<p align="center">
+  <strong>Roll or bank? Take your chances in a medieval roguelite adventure.</strong><br>
+  继续掷骰，还是收手入账？来一场中世纪风格的 Roguelite 冒险。
+</p>
 
-## Quick start
+<p align="center">Choose a language to expand below · 点击下方语言，在当前页面展开阅读</p>
 
-Install **Python 3.10 or newer** (tested with Python 3.12.10). Download or clone
-this repository, then open a terminal in the project folder containing `main.py`
-and `requirements-gui.txt`. The commands below create a local environment and
-install the window version's only external dependency, **pygame-ce 2.5.8**.
-You do not need to activate the environment.
+<div align="center">
 
-### Windows (PowerShell)
+<details>
+<summary><strong>English</strong></summary>
+<div align="left">
+
+## Get the game
+
+**With Git** — open a terminal and run:
+
+```bash
+git clone https://github.com/jinxwu2026-ship-it/dice_game.git
+cd dice_game
+```
+
+**Without Git** — [download the ZIP](https://github.com/jinxwu2026-ship-it/dice_game/archive/refs/heads/main.zip),
+or open the [repository](https://github.com/jinxwu2026-ship-it/dice_game) and choose
+**Code → Download ZIP**. Extract the ZIP, then open a terminal inside `dice_game-main`.
+
+Before continuing, make sure the current folder contains `main.py`,
+`requirements-gui.txt`, `the_kings_gambit/` and `assets/`. Keep these files together.
+
+## Install and run
+
+Install **Python 3.10 or newer** (tested with Python 3.12.10).
+The window version uses **pygame-ce 2.5.8**; the commands below install it in a
+local environment without needing to activate that environment.
+
+### Windows · PowerShell
 
 ```powershell
 python -m venv .venv
@@ -21,8 +47,8 @@ python -m venv .venv
 .\.venv\Scripts\python.exe main.py --gui
 ```
 
-If the environment is already installed, run only the last command. If Windows
-does not recognize `python`, use `py` for the first command.
+If Windows cannot find `python`, use `py` for the first command.
+After the first installation, run only the last line to play again.
 
 ### macOS / Linux
 
@@ -32,586 +58,285 @@ python3 -m venv .venv
 ./.venv/bin/python main.py --gui
 ```
 
-These are the standard platform-specific environment commands; macOS/Linux
-desktop operation has not yet been verified. On Linux, `venv` must be available
-in your Python installation.
+These are the standard commands for those platforms; actual macOS/Linux desktop
+play has not yet been verified. Linux needs Python's `venv` module installed.
+The window version needs a local desktop display and does not run in Ed's execution environment.
 
-### Start playing
+## Your first run
 
-Choose **New Run** from the window's main menu. Draw or skip the opening gifts,
-then choose your wager; a zero-coin wager is allowed. In battle:
+### 1 · Enter the adventure
 
-1. Click dice to move them into the selection tray; click again to undo.
-2. Choose **Confirm +N** to commit a legal scoring selection.
-3. Choose **Bank** to keep the turn's points, or **Roll** to risk them for more.
-   Bust loses the unbanked points; Bank and Bust advance automatically.
+Choose **New Run**. Four gamblers stand between you and the dragon's hoard.
+**Rules** explains scoring with dice pictures; **Leaderboard** shows completed local runs.
 
-Open **Rules** from the menu or during play for illustrated scoring examples.
-The interface is in English in both README language versions.
+<p align="center">
+  <img src="assets/readme/01-menu.png" width="760" alt="Main menu with New Run, Leaderboard, Rules and Quit">
+</p>
 
-### Terminal version (no external packages)
+### 2 · Pick your starting dice
 
-No pygame installation is needed for these commands. On Windows use `python`;
-on macOS/Linux use `python3` instead.
+Choose **Draw 3 starting dice**, then keep or decline each gift and select a slot
+for any die you keep. **Skip draw** starts with ordinary dice instead.
+At the wager screen, a **0-coin bet** is allowed; confirm the wager to begin.
 
-```powershell
-python main.py --run       # Complete five-battle run
-python main.py --help     # All command-line options
-```
+<p align="center">
+  <img src="assets/readme/02-opening.png" width="760" alt="Opening story and choice to draw three starting dice or skip">
+</p>
 
-Enter dice positions such as `1 3 5`, then `R` to roll or `B` to bank. In the CLI,
-press Enter after completed turns; `Q` quits. `--ascii` replaces special symbols
-with letters. `--ai-delay 0` removes the default two-second AI reading pauses.
+### 3 · Select a scoring combination
 
-GUI and CLI runs save local `.txt` records in `match_logs/`.
-There is no save/resume for an unfinished run.
+Click dice to move them into the left tray; click again to undo.
+**Clear selection** resets the preview. **Confirm +N** commits a legal selection.
+In this example, three 1s are worth **500**: adding them to **350 at risk** gives **850**.
 
-For a course submission, the graphical version must be run on a local computer
-with a desktop display; it is not supported in the Ed execution environment.
-Include `main.py`, the whole `the_kings_gambit/` package, `assets/`, and
-`requirements-gui.txt` when sharing the window version. Do not include `.venv/`
-or personal `match_logs/` files.
+<p align="center">
+  <img src="assets/readme/03-select.png" width="760" alt="Three selected 1s preview 500 points, increasing 350 at risk to 850">
+</p>
 
-Only runtime code, required artwork, the two READMEs and dependency files are
-published. Design notes, screenshots, tests, analysis tools, local environments
-and personal logs stay in the development workspace. References marked **local**
-below refer to that workspace, not files included in the public repository.
+### 4 · Roll or bank?
 
-## About the game
+After confirming, choose **Roll 3** to throw the three remaining dice, or
+**Bank 850** to secure the turn's points. Here, banking raises your match score
+from **650 to 1500**. A Bust instead loses the **850 at risk**, leaving the banked **650** safe.
+Bank and Bust show their result briefly, then advance automatically.
 
-*The King's Gambit* is a short medieval dice roguelite inspired by the Dice
-minigame in *Kingdom Come: Deliverance II*. The player faces five gamblers in a
-fixed sequence and must decide when to keep rolling for a higher score and when
-to bank points safely.
+<p align="center">
+  <img src="assets/readme/04-roll-or-bank.png" width="760" alt="Roll three remaining dice or bank 850 points for a total of 1500">
+</p>
 
-The game has a standard-library command-line interface and an optional
-pygame-ce mouse interface. Both use the same rule and progression controllers.
+The screenshots above are rendered from the current interface with a controlled
+example; the selection and decision pictures show the same turn.
 
-## Window interface
+## Rules at a glance
 
-The English main menu offers **New Run**, **Leaderboard**, **Rules**, **Quit**.
-It follows the minimal V3 concept: thin separators, 52-pixel dice, HP/coins
-bottom-left, both score bars top-left, opponent emblem top-center, turn score
-top-right. Only the active side's dice are shown. Click available dice to move
-them to the left tray; click them again to return them. **Confirm +N** commits
-the preview; **Clear selection** returns the unconfirmed dice. Only after
-confirmation do **Roll N**/**Bank S** appear, with the risk and resulting banked
-total. Ordinary three pairs instead offer **Reroll Six (+0)**. Hover or focus a
-die for its effect and actual face probabilities. Disabled actions cannot submit.
+- Each battle is a race to **2000 banked points**. Unbanked points cannot win.
+- A turn starts with six dice. Select scoring dice from the current roll, then bank or roll the remainder.
+- A **Bust** loses this turn's unbanked points. Previously banked points stay safe.
+- **Hot Dice** restores all six dice after all six have scored; accumulated points remain at risk.
+- Ordinary three pairs can explicitly reroll all six for **+0**, preserving earlier turn points.
+- Never form a combination using dice from different rolls.
 
-Use **Tab / Shift+Tab** or arrow keys to move focus, **Enter / Space** to activate,
-and **1–6** to toggle selectable fixed dice slots. Focus has corner marks;
-selected dice have check marks. All growth screens also support keyboard focus.
+Open **Rules** from the main menu or during play for both illustrated pages.
+Closing the in-game reference preserves your pending selection.
 
-**Rules** is also available at the top-right during play. Its two illustrated pages
-show real dice faces for singles, triples, extra matches, straights and pairs.
-For example, three 3s show 300, then one extra 3 shows +200. Scores come from the
-shared scorer. Closing the overlay preserves your pending selection; automatic
-turn changes wait while it is open, while AI actions continue in the background.
-Escape closes the top overlay; window-close confirmation appears above Rules.
-Matching-dice reference (local: `docs/ui_concepts/pygame_ce_rules_matches_2026-10-30.png`) ·
-Straight/pair reference (local: `docs/ui_concepts/pygame_ce_rules_combinations_2026-10-30.png`).
+<p align="center">
+  <img src="assets/readme/05-rules.png" width="760" alt="Illustrated scoring reference for singles, triples and extra matching dice">
+</p>
 
-Special dice use family colours with inset type marks. Bronze,
-Silver and Gold have thick metal rims, quality bands, B/S/G and one to three
-notches. Devil/Angel wildcard faces have their own heads; their rules are unchanged.
-Each roll has a short turning/bouncing animation; **Skip animation** reveals the
-same result immediately. Only available dice move, and gameplay input unlocks
-after the animation. Playing or skipping consumes exactly the same game randomness.
+## What is in a run?
 
-**New Run** opens on the illustrated dragon's wager and the original initial
-draw choices. Drawing offers three distinct Bronze kinds from Lucky/Two/Odd/Even/
-Momentum. There is a **20%** chance to replace one random gift with **Silver Rescue**;
-otherwise all three are Bronze. Keep or decline each gift separately; there is no
-random empty draw or Lucky Silver branch. Ordinary dice remain in the game.
-Current three-die opening (local: `docs/ui_concepts/pygame_ce_initial_three_dice_2026-10-30.png`).
-**WARD** is the story name for existing extra lives: zero still
-allows play, and losing to the Boss ends the run regardless of remaining wards.
-The opening PNG is bundled at `assets/gui/dragon_wager_intro.png`; its generation
-prompt and artwork notes stay in the local development workspace.
+Five fixed battles: **Easy → Conservative → Aggressive → Neutral elite → Composite Boss**.
+Each battle starts with fresh scores and a fair 0/1 roll for the first player.
+Coins and equipment carry over. Guessing, a spinner, rewards and a shop appear along the route.
 
-Wagers, rewards, merging, guessing, spinner and shop are mouse-driven. Choose
-one reward destination before keeping it; **Preview Merge** does not consume
-materials until placement is confirmed. **Merge Dice** at wager/shop merges
-two matching equipped items without consuming the paid shop service.
-**Bust** and **Bank** display the result for one second and continue automatically,
-for both sides in every battle. Neither needs **Next Turn**. The exit confirmation
-suspends automatic continuation. Hot Dice keeps all six completed dice in the left
-tray until the next roll; only then do they return to the center. Basic-mode clicks
-and equipped-mode clicks both take the exact physical dice shown in the preview.
-Opponents now speak short lines alongside actual actions; full strategy reasons
-remain in the `.txt` log. Events and all five opponents have brief story text.
+You start with **100 coins** and **1 WARD**, an extra life. Losing one of the first
+four battles consumes the ward and advances you to the next battle. With no ward,
+a further loss ends the run. Losing to the Boss always ends it; defeating the Boss wins.
+Boss victory offers at least one Gold die, without duplicating an already won Gold stake.
 
-Guess Size animates the actual die before showing a win/miss. The weighted
-spinner slows down onto the already chosen sector. Both support **Skip animation**;
-results stay visible until **Continue**, with no change to event odds.
-Boss victory offers at least one **Gold** die: cash and lower-tier stakes also
-qualify. A won Gold stake already fulfills this bounty, so it is not duplicated.
-Matching-quality wager settlement and the enemy's battle equipment stay unchanged.
+Special dice include **Lucky / Two / Odd / Even** for biased faces,
+**Devil / Angel** for restricted wildcards, **Momentum** for a bonus built through
+successful scoring selections, and **Rescue** for an optional once-per-battle
+reroll of the remaining pool while that die is still available.
+Hover or focus a die to see its effect and actual face probabilities.
 
-After rewards, the ending and seven-part **TOTAL SCORE** share one page. Formula v1
-uses final wards ×500, earned income, accepted Bronze/Silver/Gold ×100/250/600,
-best banked turn ÷5 (rounded down), +50 per extra successful roll in the longest
-banked chain, +1000 for banking the entire target in one turn, and
-`max(0, 500 × won battles − 20 × total turns)` for efficiency. Total turns count
-both sides.
-Income excludes the initial 100 coins, returned stakes and refunds. Bust losses
-do not qualify as banked records. The existing UTF-8 run log saves the breakdown,
-total and structured scoring history so the same calculation can be replayed.
-These performance weights are provisional; encounter difficulty has not changed.
+Completed runs receive a seven-part performance score. **Leaderboard** reads
+finished local victory/defeat records from `match_logs/*.txt`; quits and incomplete
+records do not rank. There are no online accounts or permanent gameplay upgrades.
 
-**Leaderboard** reads finished formula-v1 run scores from local `match_logs/*.txt`,
-with eight rows per page. Victory and defeat runs are ranked by score, then newest
-start for ties. Quits, unfinished/damaged files and older logs without scores are
-excluded. Opening the page reloads history; it never edits logs or writes a second index.
-Current leaderboard rendering (local: `docs/ui_concepts/pygame_ce_local_leaderboard_2026-10-30.png`).
+## Controls and local records
 
-Two new fair-faced dice can appear in run rewards, enemy equipment and shops:
-
-- **Momentum** (purple / M): when legally scored, adds 100 per earlier successful
-  scoring roll this turn, up to 400 per selection. Several selected Momentum dice
-  share one bonus. Hot Dice restores the effect and keeps the count; Bank/Bust
-  resets it. These are temporary playable values, with no balance claim.
-- **Rescue** (grey-blue / R): while still available, optionally reroll the entire
-  remaining pool once per battle. A failed roll offers **Use rescue** or **Accept
-  Bust** before clearing points. At most one equipped; new battles refresh it.
-  Fixed **Silver** in all sources; cannot merge or upgrade. Not globally unique.
-  CLI: use `R` before confirming a selection or at the rescue prompt; `S` accepts Bust.
-
-Momentum currently has identical effects at Bronze/Silver/Gold. Combination-specific
-bonuses and one-use burst dice are still deferred.
-
-AI actions are shown at the existing two-second pace. For quick testing:
-
-```powershell
-.\.venv\Scripts\python.exe main.py --gui --ai-delay 0
-```
-
-**Exit run**, Escape or closing the window opens a confirmation. **Keep playing**
-is the default; Escape dismisses it. AI turns continue behind the dialog.
-**End run** waits for wager refunds and log closure before returning to the menu
-or closing the window. This version has no save/resume.
-Actual window runs use the same timestamped UTF-8 logs
-as CLI runs; automated experiments create no personal logs.
-Window resizing preserves proportions, remaps mouse coordinates and keeps at
-least 960×600; extra width is letterboxed.
-
-Actual rendered V3 main menu (local: `docs/ui_concepts/pygame_ce_v3_menu_implemented.png`),
-battle (local: `docs/ui_concepts/pygame_ce_v3_battle_implemented.png`),
-Roll/Bank (local: `docs/ui_concepts/pygame_ce_v3_decision_implemented.png`) and
-exit confirmation (local: `docs/ui_concepts/pygame_ce_v3_exit_implemented.png`) screenshots are saved
-for comparison. Desktop click inspection was limited by the locked desktop;
-automated mouse and keyboard tests cover the complete growth run, confirmed
-cancellation and clicks at 960×600, 1280×800, 1600×900, 1920×1080 and 2560×1080.
-
-Latest rendered opening (local: `docs/ui_concepts/pygame_ce_opening_2026-10-29.png`),
-battle dice (local: `docs/ui_concepts/pygame_ce_dice_2026-10-29.png`) and
-dice catalogue (local: `docs/ui_concepts/pygame_ce_dice_catalog_2026-10-29.png`) show the
-29 October artwork and skin update. Latest examples show
-automatic Bust (local: `docs/ui_concepts/pygame_ce_bust_auto_2026-10-29.png`),
-AI dialogue (local: `docs/ui_concepts/pygame_ce_ai_dialogue_2026-10-29.png`),
-Rescue (local: `docs/ui_concepts/pygame_ce_rescue_2026-10-29.png`) and
-Momentum previews (local: `docs/ui_concepts/pygame_ce_momentum_2026-10-29.png`).
-
-Current menu (local: `docs/ui_concepts/pygame_ce_menu_2026-10-29.png`),
-guess result (local: `docs/ui_concepts/pygame_ce_guess_result_2026-10-29.png`),
-spinner result (local: `docs/ui_concepts/pygame_ce_spinner_result_2026-10-29.png`) and
-run score (local: `docs/ui_concepts/pygame_ce_run_score_2026-10-29.png`) renderings.
-
-## Project status
-
-The dice-rule core and fixed five-stage Player-versus-AI run are implemented and
-tested. GUI and CLI share scoring, selection validation, busts, banking, Hot Dice
-and progression. The run includes one extra life, wagers, victory money, events,
-rewards and a shop.
-
-A headless AI-versus-AI simulator is also available. Normal's conservative,
-neutral, aggressive and composite personalities work in both CLI and simulation;
-Hard is paused. Easy is the first-stage opponent.
-
-The revised scoring rules are implemented:
-three 1s = 500, matching dice beyond three add 200, and straights = 500/600/1,200.
-Ordinary and consecutive three pairs, repeated hot dice, and legal zero-point
-actions are supported. Each battle alternates player and AI turns and ends when
-either side banks at least 2,000 points. Campaign stages use fresh scores;
-equipment and coins carry between stages; see TODO.md (local: `TODO.md`) for remaining balance work.
-
-The growth/event rules are playable using `--run`:
-game_rules section 8 (local: `docs/game_rules.md#8-已确认的成长与事件规则`),
-游戏流程 (local: `docs/游戏流程.md`), 骰子规则 (local: `docs/骰子规则.md`).
-The adopted event order is guessing after stage 1, spinner after stage 3, then the shop after stage 4.
-骰子效果设计分析 (local: `docs/骰子效果设计分析.md`) records the implemented six-die subset
-and remaining effect/set candidates. Relics and set bonuses are not implemented.
-Earlier 经济实验 (local: `docs/数值与事件分析.md`) and `python tools/economy_analysis.py`
-reproduce a historical five-item-spinner, unrestricted-tier model, not these latest rules.
-They do not simulate special-dice combat or measure actual AI strength.
-
-The CLI gamebar shows the turn number, phase, banked score and target,
-unbanked points, latest dice, selected positions, available dice, commands and
-result messages. It refreshes in place in an interactive terminal; redirected
-output and automated tests retain readable frames instead of clearing the screen.
-Scoring rules appear in a separate box at the top, immediately followed by
-the gamebar. Both boxes are 66 columns wide and fit a standard 80-column
-terminal without the wrapping caused by the earlier side-by-side layout.
-
-## Basic game rules
-
-- Before each opponent match, one fair 0/1 roll chooses who starts:
-  0 = AI, 1 = Player. The gamebar keeps the result visible. It is not a scoring
-  die and is not repeated between turns.
-- The player and opponent take alternating turns.
-- A turn begins by rolling six dice.
-- The player selects a valid scoring subset, or explicitly activates an ordinary
-  three-pair +0 six-die reroll while preserving earlier turn points.
-- Selected points are added to the unbanked turn score.
-- The player may bank the score and end the turn, or roll the remaining dice
-  and risk the unbanked points.
-- A roll with neither a positive scoring choice nor an ordinary three-pair
-  action is a bust. All unbanked points from that turn are lost.
-- Banked points are safe. The first side to bank enough points to reach the
-  match target wins the encounter.
-- The default Version 1 match target is 2,000 points.
-- Hot dice are enabled: after all six dice score, all six become available to
-  roll again while the accumulated turn score remains at risk.
-
-### Basic scoring
-
-| Dice or combination | Points |
-|---|---:|
-| Single 1 | 100 |
-| Single 5 | 50 |
-| Three 1s | 500 |
-| Three 2s | 200 |
-| Three 3s | 300 |
-| Three 4s | 400 |
-| Three 5s | 500 |
-| Three 6s | 600 |
-
-The revised full rules add 200 per matching die beyond three; straights score
-500/600/1,200. Ordinary three pairs allow +0 rerolls; consecutive pairs
-112233/223344/334455/445566 score 1,200/1,000/1,100/1,200 and activate hot dice.
-Two triples add their values with no extra bonus. See
-docs/game_rules.md (local: `docs/game_rules.md`) for the complete scoring table,
-selection rules, and examples.
-
-## Run structure
-
-Use `python main.py --run` for the following fixed encounters:
-
-1. Common enemy: Easy (ambition 500, pending balance).
-2. Common enemy: Normal conservative.
-3. Common enemy: Normal aggressive.
-4. Elite enemy: Normal neutral.
-5. Boss: Normal composite, not Hard.
-
-The run starts with 100 coins and six basic dice. An optional initial draw precedes
-Easy; guessing follows stage 1, the six-item spinner follows stage 3, and the shop
-follows stage 4. Victory bonuses are 200/200/250/350/500, with none on losses.
-Enemy personalities stay fixed; their equipped special dice are generated per stage.
-
-HP counts extra lives, starting at 1. For the first four stages, a loss at HP=1
-consumes it and advances to the next stage with HP=0, not a retry. HP=0 is still
-playable; a further loss ends the run. Losing to the Boss always ends the run,
-even with an extra life. Defeating the Boss wins. Each stage starts with both
-scores at zero, fresh turn state and a new opening 0/1 roll; HP, coins and the
-player's equipment carry over. Enter advances after a stage; Q/EOF/Ctrl-C quits
-without another life loss. An unfinished cash wager is refunded on quitting.
-
-### Play the growth version
-
-```powershell
-python main.py --run
-python main.py --run --ai-delay 0
-python main.py --run --ascii
-```
-
-The default pauses two seconds per AI action. Use `--ascii` if the terminal's
-font displays suit symbols badly; unsupported output encodings fall back automatically.
-
-| Screen | Commands |
+| Action | Input |
 |---|---|
-| Initial draw | Enter/P draws, S skips |
-| Wager | `C 50` bets cash; Enter bets 0; `D 2` stakes your slot 2 at an actual matching quality |
-| Select dice | Type available fixed slots, e.g. `1 3 5` |
-| After selection | R rolls, B banks |
-| Inspect | H help; `I 3` active slot; `I other 3` other roster |
-| Receive die | `1..6` replaces slot; `M 2` previews merging with slot 2; D declines/cancels |
-| Equipped merge | `M 1 2` at wager/shop merges matching items free, result in slot 2 |
-| Guess event | Enter/P joins; S small, B big; after a win B claims or R risks pending prizes |
-| Spinner | Enter/P spins, S stops; up to three draws without replacement |
-| Shop | `buy 2`, `upgrade 3`, `remove 3`, `refresh`, Enter/leave |
+| Select or deselect a die | Click, or press 1–6 |
+| Move keyboard focus | Tab / Shift+Tab or arrow keys |
+| Activate the focused control | Enter / Space |
+| Read scoring rules | Rules button in the menu or during play |
+| Close an overlay / request exit | Escape; leaving a run requires confirmation |
+| Reveal an animation's result immediately | Skip animation; the result does not change |
 
-Q quits. Only a newly won battle die may be declined for 80% of its original
-price; initial/event dice give no cash. Preview cancellation preserves materials.
-The shop has one paid upgrade/removal service and one refresh; free merges do not consume the service.
+The game interface is **English**; these language sections translate the guide.
+Actual runs create timestamped UTF-8 `.txt` records in `match_logs/`.
+Records stay on your computer and are ignored by Git. Quitting ends the current run;
+there is no mid-run save/resume. Music is not included in this version.
 
-| Die | Symbol / ASCII | Effect |
-|---|---|---|
-| Lucky | ♣ / L | Bias 1 and 6 |
-| Two | ♦ / T | Bias 2 |
-| Odd | ▲ / O | Bias 1, 3, 5 |
-| Even | ■ / E | Bias 2, 4, 6 |
-| Devil | ♠ / D | Replace natural 1 with wildcard `*` |
-| Angel | ♥ / A | Replace natural 5 with wildcard `*` |
+## Terminal option
 
-B/S/G marks quality. Biased faces have weight 2/3/4 by quality; other faces have
-weight 1. Devil and Angel are always Silver, cannot upgrade, and each can be
-generated only once per run across every source, including AI and unbought shop stock.
-There are no use charges. Wildcards complete matching groups of 3–6 or straights
-of 5–6; they cannot score singly or synthesize three pairs. The selected subset
-uses its highest legal substitution, shown in the gamebar and log.
-See dice rules (local: `docs/骰子规则.md`) for exact item handling.
-
-## Opponents
-
-Each Easy opponent has a score ambition that controls its risk level. The opponent
-continues rolling while below this amount and banks once its unbanked score
-reaches or exceeds it, except after **Hot Dice**: roll all six again before checking
-the threshold at the next non-Hot scoring decision. Each new Hot Dice repeats this
-rule. Banking an immediate win still takes priority. CLI, GUI and headless matches
-share this Easy decision; Normal personalities are unchanged.
-
-Easy AI uses the highest immediate scoring legal action. Equal-score choices
-use the lexicographically earliest ascending position list. The default
-score ambition is 500, a starting value for testing rather than final balance.
-Its rolls, selected positions, score gains, Hot Dice and Bank/Roll reasons are
-shown in sequence. Each action pauses for 2 seconds; Enter advances between
-completed turns. Ctrl-C exits during AI playback without banking risked points.
-Normal's turn-utility strategy is implemented; Hard's win-probability model remains paused.
-For special equipment, Normal uses exact weighted probabilities with one future
-positive-roll lookahead, replanning at each decision. The basic-dice full-turn
-table remains unchanged. Earlier basic-dice win-rate reports do not establish
-special-dice strength; this version is not a win-probability solver.
-The AI is intended to be deterministic and easy to understand. It does not use
-machine learning.
-
-## Implemented and deferred features
-
-- A continuously updated ASCII gamebar and optional mouse interface are implemented.
-- Five opponents with different risk levels are implemented.
-- Relics, additional effects and set bonuses remain design candidates.
-- Gold, special dice, one shop and victory/defeat summaries are implemented.
-- Healing is not included in the adopted shop rules.
-- Invalid player input is validated.
-- Automated tests cover scoring and game-state changes.
-
-Version 1 does not include multiplayer, map exploration, permanent progression,
-or a large inventory system.
-
-## Requirements
-
-- Python 3.10 or newer is recommended.
-- The command-line version and headless simulation use only the standard library.
-- The optional window interface requires `pygame-ce==2.5.8`, listed in
-  [requirements-gui.txt](requirements-gui.txt).
-
-## CLI run options
-
-Play the complete five-stage sequence (one extra life):
+The complete five-battle run also works with the Python standard library alone:
 
 ```powershell
 python main.py --run
 ```
 
-To remove AI reading pauses or use letter labels:
+On macOS/Linux use `python3`. Enter dice positions such as `1 3 5`, then `R` to roll
+or `B` to bank. Press Enter after completed turns; `Q` quits.
+Use `--ascii` if special symbols do not display correctly, or `--ai-delay 0` to remove AI reading pauses.
 
-```powershell
-python main.py --run --ai-delay 0
-python main.py --run --ascii
-```
+The shared rules live in `scoring.py`, `models.py` and `battle.py`;
+`progression.py` controls the five-battle run. The optional GUI is in `gui.py` and
+`gui_session.py`, and `requirements-gui.txt` lists its dependency.
+Design notes, tests, analysis tools and personal histories stay in the local
+development workspace; the public repository includes only runtime files,
+README illustrations, guides and dependencies.
 
-Normal compares expected turn utility, including remaining dice, rather than
-using the Easy ambition. Gamma is 0.5/1/2 for conservative/neutral/aggressive.
-Composite chooses a personality at the start of each AI turn using score gap
-and opponent threat, and keeps it for that turn. Normal reasons and utilities
-are shown and logged; utilities are not win probabilities. `--ambition` affects
-only Easy (a supplied value must still be positive); `--ai-delay` applies to both.
-Stage personalities are fixed and cannot be overridden for a run.
+</div>
+</details>
 
-`--ai-delay 0` removes timed pauses; completed turns still wait for Enter.
-The delay must be finite and non-negative; ambition must be a positive integer.
+<details>
+<summary><strong>简体中文</strong></summary>
+<div align="left">
 
-Enter positions such as `1 3 5` to select dice, then `R` to roll or `B` to bank.
-After a completed turn, press Enter to start the next turn or Q to quit.
-For ordinary three pairs, selecting all six positions explicitly activates a
-zero-point reroll; there is no Bank prompt before that reroll. Selecting only
-scoring 1s/5s instead remains possible. `Q`, EOF, or Ctrl-C exits the run.
+## 获取游戏
 
-`models.MatchState` tracks both scores, the active side and winner. `ui.py` only renders
-frames and parses input; scoring and state changes stay in the core modules.
-`progression.run_campaign()` coordinates stages and applies the confirmed extra-life
-rules to `models.RunState`, reusing `battle.run_match()` for every stage.
-
-## Match records
-
-An actual GUI or CLI run is automatically saved as a UTF-8 text file
-in `match_logs/`, named by the local start time, for example
-`2026-10-08_15-30-20_123456.txt`. Microseconds distinguish starts within one
-second; existing records are never overwritten. The CLI prints the saved path
-when the run ends or you quit.
-
-Each event records the turn number, acting side, dice in positional order,
-selected positions, available dice, phase, both banked scores, the acting
-side's current banked score and unbanked turn score. AI Bank/Roll reasons,
-Hot Dice, ordinary three pairs, Bust losses and the winner or early exit are
-included. Events are flushed immediately, so earlier actions survive an
-interruption. On quit, any displayed unbanked points are discarded, not banked.
-
-A whole campaign uses one
-timestamped file containing RUN/STAGE start/end events and per-action stage/HP
-context. It records final results and quitting; scores never carry across stages.
-Direct controller calls without a writer (including automated tests/simulations)
-do not create personal records.
-Logging tests use temporary directories, not `match_logs/`. Records remain
-local and are ignored by Git; there is no upload or automatic deletion.
-
-## Headless AI experiments
-
-Run the default 100-match Easy 500 versus Easy 500 experiment:
-
-```powershell
-python -m the_kings_gambit.simulation --games 100 --seed 20261013
-```
-
-Compare different Easy thresholds, for example:
-
-```powershell
-python -m the_kings_gambit.simulation --games 100 --ambition-a 500 --ambition-b 750 --seed 20261013
-```
-
-Select either side's Normal personality using `--ai-a` / `--ai-b`:
-
-```powershell
-python -m the_kings_gambit.simulation --games 100 --ai-a composite --ai-b easy --seed 20261013
-python -m the_kings_gambit.simulation --games 100 --ai-a conservative --ai-b aggressive --seed 20261013
-```
-
-Default target is 2,000; `--target` can change it for experiments. Games, ambitions
-and target must be positive integers; seed is an integer. Each match starts with
-zero scores and stops immediately after a winning Bank. A/B alternate first
-turns (100 matches: 50 each; for odd counts A starts once more). Match index i
-uses seed+i. This controlled start is for experiments only: gameplay retains
-its random opening 0/1. Dice consumption changes with policies, so using the
-same seed for different policies does not mean identical rolls for every turn.
-
-Results include wins, approximate 95% Wilson intervals, first/second-turn wins,
-turns, rolls, Bust rates, mean points per Bank (excluding Bust), Hot Dice,
-ordinary pairs and batch runtime. Core experiment calls are reproducible except
-for elapsed time. No UI, manual input, pauses or file writes occur; personal
-`match_logs/` is never used. Safety limits abort explicitly, not as fake draws.
-
-The 100-game experiment is separate from unittest and is a preliminary sample,
-not proof that an ambition is optimal. See Normal implementation (local: `docs/normal_ai_design.md`)
-and Normal's 100-game preliminary results (local: `docs/normal_ai_results.txt`).
-The two 13 October Easy smoke experiments are saved in
-baseline results (local: `docs/ai_simulation_baseline.txt`); these do not change the
-game's default ambition of 500.
-
-Run every pair among Easy 500 and the four Normal personalities:
-
-```powershell
-python -m the_kings_gambit.simulation --round-robin --games 1000 --seed 2026102600
-```
-
-Here `--games` means games per pair: five profiles produce ten pairs and 10,000
-matches. Each pair gets a separate seed range starting at `seed + pair_index * games`;
-round-robin requires an even count so both sides get equal starts. Its default
-seed is 2026102600, separate from the pairwise default of 20261013.
-Pair order follows `AI_TYPES` in `ai.py`.
-Round-robin fixes Easy at 500 and rejects conflicting pairwise AI/ambition options.
-It prints a win-rate matrix, descriptive pool rates and the usual pair reports,
-without tuning parameters or writing files. These are measured matchup rates,
-not Normal's decision-time utility values or a guarantee of increasing difficulty.
-Large runs print the report after all pairs finish; this 10,000-match run took
-about four minutes on the current environment, not a fixed runtime guarantee.
-See 26 October cross-play results (local: `docs/ai_round_robin_2026-10-26.txt`).
-
-## Running tests
-
-The `tests/` folder stays local and is not included in the public runtime files.
-The following commands apply to the full development workspace.
-
-Run the automated tests with:
-
-```powershell
-python -m unittest discover -s tests
-```
-
-To include pygame rendering and mouse tests, run inside the GUI environment:
-
-```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests
-```
-
-On macOS/Linux:
+**使用 Git**：打开终端并执行：
 
 ```bash
-./.venv/bin/python -m unittest discover -s tests
+git clone https://github.com/jinxwu2026-ship-it/dice_game.git
+cd dice_game
 ```
 
-Without pygame-ce, the optional rendering tests skip while core and bridge
-tests run. GUI tests use an offscreen SDL display, injected dice and temporary
-logs; they never write into your personal `match_logs/`.
+**不使用 Git**：直接[下载 ZIP](https://github.com/jinxwu2026-ship-it/dice_game/archive/refs/heads/main.zip)，
+或进入[项目主页](https://github.com/jinxwu2026-ship-it/dice_game)，选择 **Code → Download ZIP**。
+解压后，在 `dice_game-main` 文件夹中打开终端。
 
-## Local development documentation
+继续之前，确认当前文件夹包含 `main.py`、`requirements-gui.txt`、`the_kings_gambit/` 和 `assets/`。
+请将这些文件保留在一起。
 
-- Game design (local: `docs/game_design.md`) — concept, scope, run structure, UI, and
-  completion criteria.
-- Game rules (local: `docs/game_rules.md`) — exact scoring and turn rules.
-- Scoring and AI reference (local: `docs/scoring_and_ai_reference.md`) — archived source;
-  statistical claims await independent reproduction.
-- Normal AI implementation (local: `docs/normal_ai_design.md`) — three fixed personalities
-  and a situation-based composite; Hard paused.
-- Hard AI memo (local: `docs/hard_ai_memo.md`) — brief offline win-model ideas only;
-  not an implementation requirement or the current Boss strategy.
-- Project to-do list (local: `TODO.md`) — unresolved decisions and development work.
-- Agent guidance (local: `AGENTS.md`) — implementation boundaries and quality
-  requirements.
+## 安装依赖并运行
 
-## Full local project structure
+安装 **Python 3.10 或更新版本**，当前验证环境为 Python 3.12.10。
+窗口版需要 **pygame-ce 2.5.8**。下面的命令会创建本地虚拟环境并安装依赖，无需手动激活环境。
 
-```text
-README.md                       # English guide
-README.zh-CN.md                 # Simplified Chinese guide
-requirements-gui.txt            # Optional pygame-ce dependency
-main.py                         # CLI/window launcher
-the_kings_gambit/
-|-- main.py                      # CLI options and personal log files
-|-- dice.py                      # Physical dice and weighted rolls
-|-- scoring.py                   # Legal subsets and wildcard substitution
-|-- models.py                    # Item, turn, match and run state
-|-- battle.py                    # Shared player/AI turns
-|-- ai.py                        # Normal utility and personalities
-|-- simulation.py                # Headless basic-dice AI experiments
-|-- progression.py               # Wagers, rewards, events, shop and five stages
-|-- run_score.py                 # Replayable seven-part run score; no I/O
-|-- gui_session.py               # Worker, immutable display snapshots and input requests
-|-- gui.py                       # pygame-ce rendering and mouse interaction
-`-- ui.py                        # Panels, symbols and input
-tests/                          # unittest; no personal match logs
-|-- test_dice.py
-|-- test_scoring.py
-|-- test_ai.py
-|-- test_normal_ai.py
-|-- test_simulation.py
-|-- test_progression.py
-|-- test_growth.py               # Economy and complete growth run
-|-- test_gui.py                  # Snapshot isolation and complete mouse-driven run
-|-- test_special_dice.py         # Weights, wildcards, fixed slots and AI
-|-- test_effect_dice.py          # Momentum, Rescue, shared AI/growth/log rules
-|-- test_event_screens.py        # Actual event animation/result snapshots
-|-- test_run_score.py            # Score replay, income and Boss bounty
-|-- test_leaderboard.py          # Read-only history ranking and malformed logs
-|-- test_initial_rewards.py      # Three starting gifts and Silver-only Rescue
-|-- test_match_log.py
-|-- test_economy_analysis.py
-`-- test_ui.py
-docs/                           # Rules, designs and historical experiments
-assets/gui/                     # Opening artwork and its source notes
-match_logs/                     # Actual GUI/CLI opponent games only
-tools/                          # Historical economy analysis
+### Windows · PowerShell
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-gui.txt
+.\.venv\Scripts\python.exe main.py --gui
 ```
 
-Start reviewing with `models.Die` and `dice.roll_item`, then
-`scoring.turn_actions`, `battle.begin_roll` / `resolve_roll`, and finally
-`progression.run_campaign`. The UI renders state; scoring has no input/output.
+如果 Windows 找不到 `python`，第一行改用 `py`。首次安装后，再次游玩只需执行最后一行。
+
+### macOS / Linux
+
+```bash
+python3 -m venv .venv
+./.venv/bin/python -m pip install -r requirements-gui.txt
+./.venv/bin/python main.py --gui
+```
+
+这些是对应平台的标准命令，尚未验证 macOS/Linux 桌面的实际游玩。Linux 需要安装 Python 的 `venv` 模块。
+窗口版需要本地桌面显示，不能直接在 Ed 的执行环境中运行。
+
+## 开始你的第一场冒险
+
+### 1 · 进入冒险
+
+点击 **New Run**。四名赌徒挡在你与恶龙宝藏之间。
+**Rules** 提供骰面图示规则，**Leaderboard** 展示已经结束的本地冒险排名。
+
+<p align="center">
+  <img src="assets/readme/01-menu.png" width="760" alt="主菜单，包含 New Run、Leaderboard、Rules 和 Quit">
+</p>
+
+### 2 · 选择开局骰子
+
+点击 **Draw 3 starting dice** 抽取三颗开局骰子，逐颗决定保留或放弃；保留时选择放置槽位。
+也可选择 **Skip draw**，直接携带普通骰子开始。
+进入赌注界面后，允许选择 **0 金币下注**，确认赌注即可开战。
+
+<p align="center">
+  <img src="assets/readme/02-opening.png" width="760" alt="开场故事，以及抽取三颗开局骰子或跳过的选择">
+</p>
+
+### 3 · 选出得分组合
+
+点击骰子，将其移到左侧选择区；再次点击可撤回。
+**Clear selection** 清空预览，**Confirm +N** 确认一个合法选择。
+图中三个 1 可获得 **500 分**，加上已有的 **350 风险分**，确认后共有 **850 分**尚未入账。
+
+<p align="center">
+  <img src="assets/readme/03-select.png" width="760" alt="选中三个 1，预览增加 500 分，将 350 风险分提高到 850">
+</p>
+
+### 4 · Roll，还是 Bank？
+
+确认后，可以选择 **Roll 3** 投掷剩余三颗骰子，或 **Bank 850** 收手保住本回合分数。
+图中若入账，战斗总分从 **650 提升到 1500**；若继续投掷后 Bust，则丢失 **850 风险分**，
+已经入账的 **650 分**仍然安全。
+Bank 和 Bust 会短暂展示结果，然后自动切换回合。
+
+<p align="center">
+  <img src="assets/readme/04-roll-or-bank.png" width="760" alt="投掷剩余三颗骰子，或将 850 分入账并达到总分 1500">
+</p>
+
+以上图片由当前游戏界面按受控示例渲染，选骰图和决策图展示同一个回合。
+
+## 快速了解规则
+
+- 每场战斗以 **入账达到 2000 分**为胜利条件，风险分不能直接获胜。
+- 回合从六颗骰子开始，每次选择当前投掷中可计分的骰子，然后入账或继续掷剩余骰子。
+- **Bust** 丢失本回合所有未入账分数，此前已入账的分数不受影响。
+- **Hot Dice**：六颗骰子全部计分后恢复六颗可掷骰子，累计分数继续承担风险。
+- 普通三对可以明确选择六颗，以 **+0** 全部重掷，并保留此前风险分。
+- 不可使用不同次投掷的骰子拼成组合。
+
+主菜单和游玩界面的 **Rules** 都提供两页图示规则；关闭游玩中的规则窗口会保留尚未确认的选择。
+
+<p align="center">
+  <img src="assets/readme/05-rules.png" width="760" alt="使用真实骰面展示单颗、三同和额外同点骰加分的规则页">
+</p>
+
+## 一次冒险有什么？
+
+固定五场战斗：**Easy → 保守 → 激进 → 中性精英 → 复合人格 Boss**。
+每场双方分数归零，公平掷一次 0/1 决定先手；金币和装备跨场保留。
+途中会遇到猜大小、转盘、奖励和商店。
+
+初始持有 **100 金币**和 **1 WARD**。WARD 表示额外生命：前四场中失败一次会消耗它，随后进入下一场。
+WARD 为 0 仍可继续，但再输一场就结束冒险。输给 Boss 无论剩余多少 WARD 都会结束，击败 Boss 则获胜。
+Boss 胜利至少提供一颗 Gold 奖励骰；如果已赢得 Gold 赌注，不重复发放。
+
+特殊骰子包括改变骰面概率的 **Lucky / Two / Odd / Even**、受限万能面的 **Devil / Angel**、
+随成功计分选择积累加分的 **Momentum**，以及实体骰子仍在可用骰池时可选发动、每场一次重掷剩余骰池的 **Rescue**。
+悬停或聚焦骰子可查看效果和实际骰面概率。
+
+冒险结束后会结算七项表现分。**Leaderboard** 从 `match_logs/*.txt` 读取已结束的本地胜利/失败记录；
+退出或未完成的冒险不参与排名。没有在线账号，也没有跨局永久能力成长。
+
+## 操作与本地记录
+
+| 动作 | 操作 |
+|---|---|
+| 选择或撤回骰子 | 点击，或按 1–6 |
+| 移动键盘焦点 | Tab / Shift+Tab 或方向键 |
+| 激活当前控件 | Enter / Space |
+| 阅读计分规则 | 主菜单或游玩界面的 Rules |
+| 关闭弹窗 / 请求退出 | Escape；退出冒险需要确认 |
+| 立即显示动画结果 | Skip animation，不会改变结果 |
+
+游戏界面为**英文**，此处的语言选项只切换说明文档内容。
+实际冒险会在 `match_logs/` 生成按开始时间命名的 UTF-8 `.txt` 记录，仅保存在你的电脑上，Git 会忽略它们。
+退出即结束当前冒险，不支持中途存档恢复。当前版本未加入背景音乐。
+
+## 终端运行方式
+
+完整五场流程也可仅使用 Python 标准库运行：
+
+```powershell
+python main.py --run
+```
+
+macOS/Linux 使用 `python3`。输入 `1 3 5` 等骰子位置，然后 `R` 继续掷骰或 `B` 入账。
+完整回合结束后按 Enter 继续，`Q` 退出。
+特殊符号显示异常时使用 `--ascii`；`--ai-delay 0` 可取消 AI 阅读停顿。
+
+共用规则位于 `scoring.py`、`models.py`、`battle.py`；`progression.py` 管理五场冒险。
+可选窗口界面由 `gui.py` 和 `gui_session.py` 实现，依赖列于 `requirements-gui.txt`。
+设计文档、测试、分析工具和个人历史仅保留在本地开发目录；公开仓库只包含运行文件、
+README 插图、说明文档和依赖文件。
+
+</div>
+</details>
+
+</div>

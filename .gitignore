@@ -1,4 +1,4 @@
-# Publish only runtime code, required artwork, READMEs and dependencies.
+# Publish runtime code, required artwork, README illustrations and dependencies.
 # Everything else stays local, including docs, tests, tools and match logs.
 /*
 !/.gitignore
@@ -16,6 +16,15 @@
 !/assets/gui/
 /assets/gui/*
 !/assets/gui/dragon_wager_intro.png
+
+!/assets/readme/
+/assets/readme/*
+!/assets/readme/cover.png
+!/assets/readme/01-menu.png
+!/assets/readme/02-opening.png
+!/assets/readme/03-select.png
+!/assets/readme/04-roll-or-bank.png
+!/assets/readme/05-rules.png
 
 __pycache__/
 *.py[cod]
