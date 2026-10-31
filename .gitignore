@@ -1,6 +1,21 @@
+# Publish only runtime code, required artwork, READMEs and dependencies.
+# Everything else stays local, including docs, tests, tools and match logs.
+/*
+!/.gitignore
+!/main.py
+!/README.md
+!/README.zh-CN.md
+!/requirements*.txt
+
+!/the_kings_gambit/
+/the_kings_gambit/*
+!/the_kings_gambit/*.py
+
+!/assets/
+/assets/*
+!/assets/gui/
+/assets/gui/*
+!/assets/gui/dragon_wager_intro.png
+
 __pycache__/
-*.pyc
-.vscode/
-.env
-.codex
-match_logs/*.txt
+*.py[cod]
