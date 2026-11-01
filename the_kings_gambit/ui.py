@@ -78,12 +78,17 @@ def opponent_presentation(event, personality, state, positions=(), command=""):
 
 def die_effect_text(die):
     if die.kind == "momentum":
-        return f"Score die: +{MOMENTUM_PER_SUCCESS} per earlier success, cap {MOMENTUM_CAP}; Hot Dice keeps count."
+        return f"Score it: +{MOMENTUM_PER_SUCCESS} per earlier success (max +{MOMENTUM_CAP}). Shared bonus; Hot Dice keeps count."
     if die.kind == "rescue":
-        return "Silver only; no merge/upgrade. While available: full-pool reroll once per battle. Max one equipped."
+        return "While available: reroll all remaining dice once per battle. Max one; no merge/upgrade."
     if die.kind in ("devil","angel"):
-        return f"Wildcard replaces {1 if die.kind == 'devil' else 5}. No scoring singles or pairs."
-    return "Fair six-sided die." if die.kind == "basic" else "Changes probabilities, not scoring."
+        return f"{1 if die.kind == 'devil' else 5} becomes wild for 3-6 matches or 5/6 straights. No singles/pairs."
+    if die.kind == "basic":
+        return "Fair six-sided die."
+    odds = face_distribution(die.kind,die.quality)
+    lowest = min(chance for _,chance in odds)
+    faces = "/".join(str(face) for face,chance in odds if chance > lowest)
+    return f"Favors {faces}. Higher quality strengthens this bias; normal scoring."
 
 
 def symbols_enabled():

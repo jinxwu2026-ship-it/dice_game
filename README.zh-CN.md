@@ -116,7 +116,7 @@ Bank 和 Bust 会短暂展示结果，然后自动切换回合。
 - 普通三对可以明确选择六颗，以 **+0** 全部重掷，并保留此前风险分。
 - 不可使用不同次投掷的骰子拼成组合。
 
-主菜单和游玩界面的 **Rules** 都提供两页图示规则；关闭游玩中的规则窗口会保留尚未确认的选择。
+主菜单和游玩界面的 **Rules** 都提供计分图解和特殊骰子指南；关闭游玩中的规则窗口会保留尚未确认的选择。
 
 <p align="center">
   <img src="assets/readme/05-rules.png" width="760" alt="使用真实骰面展示单颗、三同和额外同点骰加分的规则页">
@@ -132,9 +132,40 @@ Bank 和 Bust 会短暂展示结果，然后自动切换回合。
 WARD 为 0 仍可继续，但再输一场就结束冒险。输给 Boss 无论剩余多少 WARD 都会结束，击败 Boss 则获胜。
 Boss 胜利至少提供一颗 Gold 奖励骰；如果已赢得 Gold 赌注，不重复发放。
 
-特殊骰子包括改变骰面概率的 **Lucky / Two / Odd / Even**、受限万能面的 **Devil / Angel**、
-随成功计分选择积累加分的 **Momentum**，以及实体骰子仍在可用骰池时可选发动、每场一次重掷剩余骰池的 **Rescue**。
-悬停或聚焦骰子可查看效果和实际骰面概率。
+### 骰子类型与品质
+
+普通骰子六面公平，没有特殊品质。特殊骰子通过金属边框、B/S/G 字母和一至三道刻痕表示品质：
+
+| 品质 | 标记 | 偏置强度 |
+|---|---|---|
+| Bronze 铜 | B / 1 道刻痕 | 偏置面权重为 2，其他面为 1 |
+| Silver 银 | S / 2 道刻痕 | 偏置面权重为 3，其他面为 1 |
+| Gold 金 | G / 3 道刻痕 | 偏置面权重为 4，其他面为 1 |
+
+品质越高，偏置面越容易出现；基础计分表不随品质倍增。
+Momentum 当前三个品质的效果相同；Devil、Angel 和 Rescue 固定为 Silver，不能合成或升级。
+
+| 骰子 | 可用品质 | 效果 |
+|---|---|---|
+| Basic 普通 | 无 | 1–6 公平出现，按基础规则计分 |
+| Lucky 幸运 | 铜 / 银 / 金 | 偏向 **1 和 6** |
+| Two 双点 | 铜 / 银 / 金 | 偏向 **2** |
+| Odd 奇数 | 铜 / 银 / 金 | 偏向 **1、3、5** |
+| Even 偶数 | 铜 / 银 / 金 | 偏向 **2、4、6** |
+| Devil 魔鬼 | 仅银 | 自然 **1 被万能面取代**，不再具有自然 1 面 |
+| Angel 天使 | 仅银 | 自然 **5 被万能面取代**，不再具有自然 5 面 |
+| Momentum 蓄势 | 铜 / 银 / 金 | 合法计分取走该骰时，本回合此前每次正分选择提供 **+100**，最多 **+400** |
+| Rescue 救援 | 仅银 | 该骰仍可掷时，可选重掷**整个剩余骰池，每场一次**；也可在接受 Bust 前使用 |
+
+- **万能面**只补成 3–6 颗同点组合或 5–6 颗顺子，不能单颗计分或组成对子组合。
+  整个冒险中 Devil 和 Angel 各最多生成一次，涵盖 AI、商店等所有来源。
+- **蓄势**需要把 Momentum 本身合法计分取走，才兑现加分；同次选择多颗只共享一份加分。
+  Hot Dice 保留累计次数，Bank 或 Bust 清零。当前数值是尚未平衡的临时方案。
+- **救援**可选择保留不用，每方最多装备一颗。计分取走后暂不可发动，Hot Dice 恢复骰子后可重新满足在场条件。
+  Hot Dice 和新回合均不恢复已消耗的次数，只有新战斗恢复。
+
+主菜单或游玩中打开 **Rules → Special dice**，可一次查看图示目录。
+悬停或聚焦单颗骰子，可查看该骰的实际骰面概率。
 
 冒险结束后会结算七项表现分。**Leaderboard** 从 `match_logs/*.txt` 读取已结束的本地胜利/失败记录；
 退出或未完成的冒险不参与排名。没有在线账号，也没有跨局永久能力成长。
@@ -329,7 +360,7 @@ example; the selection and decision pictures show the same turn.
 - Ordinary three pairs can explicitly reroll all six for **+0**, preserving earlier turn points.
 - Never form a combination using dice from different rolls.
 
-Open **Rules** from the main menu or during play for both illustrated pages.
+Open **Rules** from the main menu or during play for scoring examples and the special-dice guide.
 Closing the in-game reference preserves your pending selection.
 
 <p align="center">
@@ -347,11 +378,45 @@ four battles consumes the ward and advances you to the next battle. With no ward
 a further loss ends the run. Losing to the Boss always ends it; defeating the Boss wins.
 Boss victory offers at least one Gold die, without duplicating an already won Gold stake.
 
-Special dice include **Lucky / Two / Odd / Even** for biased faces,
-**Devil / Angel** for restricted wildcards, **Momentum** for a bonus built through
-successful scoring selections, and **Rescue** for an optional once-per-battle
-reroll of the remaining pool while that die is still available.
-Hover or focus a die to see its effect and actual face probabilities.
+### Dice types and qualities
+
+Basic dice are fair and have no quality. Special dice use metal bands, B/S/G
+letters and one to three notches to show quality:
+
+| Quality | Mark | Biased-face strength |
+|---|---|---|
+| Bronze | B / 1 notch | Favoured faces have weight 2; other faces weight 1 |
+| Silver | S / 2 notches | Favoured faces have weight 3; other faces weight 1 |
+| Gold | G / 3 notches | Favoured faces have weight 4; other faces weight 1 |
+
+Higher quality strengthens biased faces. It does not multiply the base scoring table.
+Momentum currently has the same effect at all three qualities; Devil, Angel and
+Rescue are fixed Silver and cannot merge or upgrade.
+
+| Die | Available qualities | Effect |
+|---|---|---|
+| Basic | None | Fair faces 1–6, standard scoring |
+| Lucky | B / S / G | Favours **1 and 6** |
+| Two | B / S / G | Favours **2** |
+| Odd | B / S / G | Favours **1, 3 and 5** |
+| Even | B / S / G | Favours **2, 4 and 6** |
+| Devil | Silver only | Natural **1 is replaced by a wildcard**; that natural 1 is unavailable |
+| Angel | Silver only | Natural **5 is replaced by a wildcard**; that natural 5 is unavailable |
+| Momentum | B / S / G | When this die is legally scored, add **100 per earlier positive selection this turn**, capped at **+400** |
+| Rescue | Silver only | While still available, optionally reroll **all remaining dice once per battle**, including before accepting Bust |
+
+- **Wildcards** complete matching groups of 3–6 or straights of 5–6. They cannot
+  score as singles or create pair patterns. Devil and Angel are each generated
+  at most once per run across all sources, including the AI and shop.
+- **Momentum** pays only when you score the Momentum die itself. Multiple
+  Momentum dice in one selection share a single bonus. Hot Dice keeps the count;
+  Bank or Bust resets it. These are provisional, unbalanced values.
+- **Rescue** is optional, with at most one equipped per side. Setting it aside
+  removes its availability until Hot Dice restores it. Hot Dice and new turns
+  do not refresh its charge; only a new battle does.
+
+Open **Rules → Special dice** from the menu or during play for the illustrated
+catalogue. Hover or focus an individual die to see its actual face probabilities.
 
 Completed runs receive a seven-part performance score. **Leaderboard** reads
 finished local victory/defeat records from `match_logs/*.txt`; quits and incomplete

@@ -7,10 +7,10 @@ from time import monotonic
 
 import pygame
 
-from the_kings_gambit.dice import PRICES, face_distribution
+from the_kings_gambit.dice import PRICES, face_distribution, die_weights
 from the_kings_gambit.gui_session import GameSession
 from the_kings_gambit.main import load_leaderboard
-from the_kings_gambit.models import Die
+from the_kings_gambit.models import Die, DIE_KINDS, QUALITIES
 from the_kings_gambit.ui import die_effect_text, ENCOUNTER_STORIES
 from the_kings_gambit.scoring import scoring_examples
 
@@ -93,6 +93,9 @@ class GameWindow:
         self.hover = None
         self.mouse = (-1, -1)
         self.basic = tuple(Die() for _ in range(6))
+        self.guide_dice = {kind: Die(kind,"silver" if kind in ("devil","angel","rescue") else "bronze")
+                           for kind in DIE_KINDS if kind != "basic"}
+        self.guide_qualities = {quality: Die("lucky",quality) for quality in QUALITIES}
         self.log_path = None
         self.overlays = []
         self.focus = None
@@ -636,13 +639,15 @@ class GameWindow:
         elif screen == "wager":
             self.text(f"BATTLE {v['stage']}", 1000, 64, 20)
             self.text(f"MAX BET {v['cap']}", 1000, 104, 20)
+            mode_y = 240
             if v["stage"] == 5:
-                self.text("Victory bounty: at least one Gold die",640,225,20,ACCENT,center=True)
+                bounty = self.text("Victory bounty: at least one Gold die",640,225,20,ACCENT,center=True)
+                mode_y = bounty.bottom+14
             self.die(v["main"], "?", 180, 300)
             self.lines(f"AI stake: {v['main'].kind.title()} · {v['main'].quality.title()}", 65, 395, 260)
             mode = self.choice.get("mode","cash")
             for i, (text, value) in enumerate((("Coins","cash"),("Die","die"))):
-                self.button(text, (450+i*205,240,190,44), ("choice",("mode",value)),
+                self.button(text, (450+i*205,mode_y,190,44), ("choice",("mode",value)),
                             enabled=active and (value == "cash" or bool(v["choices"])), active=mode == value)
             if mode == "cash":
                 amount = self.choice.get("amount",0)
@@ -830,10 +835,12 @@ class GameWindow:
         pygame.draw.rect(self.surface,BG,panel,border_radius=8)
         pygame.draw.rect(self.surface,LINE,panel,width=1,border_radius=8)
         self.buttons,self.die_details,self.hover = [],[],None
-        self.text("SCORING RULES",panel.centerx,panel.top+26,30,center=True,bold=True)
-        self.text("Use dice from one roll. Bank saves points; Bust loses unbanked points.",
+        self.text("SPECIAL DICE GUIDE" if page == 2 else "SCORING RULES",panel.centerx,panel.top+26,30,center=True,bold=True)
+        subtitle = ("Type sets the effect. Quality strengthens biased faces; base scoring stays the same." if page == 2
+                    else "Use dice from one roll. Bank saves points; Bust loses unbanked points.")
+        self.text(subtitle,
                   panel.centerx,panel.top+80,19,MUTED,center=True)
-        self.text(f"{page+1} / 2 · "+("SINGLES & MATCHES" if page == 0 else "STRAIGHTS & PAIRS"),
+        self.text(f"{page+1} / 3 · "+("SINGLES & MATCHES","STRAIGHTS & PAIRS","SPECIAL DICE")[page],
                   panel.centerx,panel.top+130,22,ACCENT,center=True)
         left,right = panel.left+66,panel.centerx+38
         data = self.rule_examples
@@ -862,7 +869,7 @@ class GameWindow:
             for index,item in enumerate(data["extras"][1:]):
                 example(item,right,486+index*68,right+370)
             note = "Only banked points reach 2000. Never combine dice from separate rolls."
-        else:
+        elif page == 1:
             self.text("STRAIGHTS",left,207,18,MUTED)
             for index,item in enumerate(data["straights"]):
                 example(item,left,246+index*80,left+370)
@@ -876,14 +883,36 @@ class GameWindow:
             self.lines("HOT DICE: scoring all six returns your original six dice. Turn points stay at risk.",
                        right,566,520,18,MUTED)
             note = "HP counts extra lives. HP=0 can still play; losing to the Boss ends the run."
+        else:
+            self.surface.blit(self.die_face(self.basic[0],3),(left,205))
+            self.text("Basic",left+68,205,18,TEXT,bold=True)
+            self.text("Fair faces 1-6; no effect.",left+68,232,16,MUTED)
+            for index,(quality,die) in enumerate(self.guide_qualities.items()):
+                x = right-68+index*188
+                self.surface.blit(self.die_face(die,1),(x,205))
+                self.text(quality.title(),x+64,205,18,TEXT,bold=True)
+                self.text(f"Bias weight {max(die_weights(die))}",x+64,232,16,MUTED)
+            self.text("B/S/G bands and 1/2/3 notches show quality. Other faces have weight 1.",
+                      panel.centerx,264,16,MUTED,center=True)
+            for index,(kind,die) in enumerate(self.guide_dice.items()):
+                x,y = (left if index%2 == 0 else right),288+(index//2)*80
+                face = 0 if kind in ("devil","angel") else 1
+                self.surface.blit(self.die_face(die,face),(x,y+5))
+                quality = "Silver only" if die.quality == "silver" else "B/S/G"
+                unique = " · unique" if kind in ("devil","angel") else ""
+                self.text(f"{kind.title()} · {quality}{unique}",x+68,y,18,TEXT,bold=True)
+                self.lines(die_effect_text(die),x+68,y+24,456,16,MUTED)
+            note = "Unique: one of each per run. Momentum resets on Bank/Bust; Rescue refreshes each battle."
         self.text(note,panel.centerx,620,17,MUTED,center=True)
         if overlay:
             self.text("AI continues in the background. Automatic turn changes wait while rules are open.",
                       panel.centerx,644,15,MUTED,center=True)
         self.rule(panel.left+54,664,panel.right-54,664)
-        for index,label in enumerate(("Singles & matches","Straights & pairs")):
-            self.button(label,(left+index*280,692,260,48),("rules_page",index),active=page == index)
-        self.button("Close rules" if overlay else "Back",(panel.right-290,692,236,48),
+        labels = ("Singles & matches","Straights & pairs","Special dice")
+        controls = row_rects((panel.left,668,panel.width,96),4,width=260,height=48,gap=16)
+        for index,label in enumerate(labels):
+            self.button(label,controls[index],("rules_page",index),active=page == index)
+        self.button("Close rules" if overlay else "Back",controls[-1],
                     "close_rules" if overlay else "menu")
 
     def leaderboard(self):
